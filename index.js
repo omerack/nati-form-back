@@ -221,5 +221,5 @@ module.exports = async function ({ req, res }) {
   //   return res.send("Message sent");
   // }
 
-  return res.send("pussy");
+  return res.send("dick");
 };
