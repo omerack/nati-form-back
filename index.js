@@ -211,15 +211,15 @@
 // });
 
 module.exports = async function ({ req, res }) {
-  if (
-    req.method === "POST" &&
-    req.headers["content-type"] === "application/x-www-form-urlencoded"
-  ) {
-    const formData = querystring.parse(req.body);
-    console.log(formData);
+  // if (
+  //   req.method === "POST" &&
+  //   req.headers["content-type"] === "application/x-www-form-urlencoded"
+  // ) {
+  //   const formData = querystring.parse(req.body);
+  //   console.log(formData);
 
-    return res.send("Message sent");
-  }
+  //   return res.send("Message sent");
+  // }
 
-  return res.send("Not found", 404);
+  return res.send("pussy");
 };
