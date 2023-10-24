@@ -210,7 +210,7 @@
 //   console.log(`Server is running on port ${port}`);
 // });
 
-export default async function ({ req, res }) {
+module.exports = async function ({ req, res }) {
   if (
     req.method === "POST" &&
     req.headers["content-type"] === "application/x-www-form-urlencoded"
@@ -218,9 +218,8 @@ export default async function ({ req, res }) {
     const formData = querystring.parse(req.body);
     console.log(formData);
 
-
     return res.send("Message sent");
   }
 
   return res.send("Not found", 404);
-}
+};
