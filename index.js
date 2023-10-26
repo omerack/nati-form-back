@@ -197,29 +197,29 @@
 //   res.send("Form data received successfully");
 // });
 
-// // app.get("/preview/:id", async (req, res) => {
-// //   const userId = req.params.id;
+// app.get("/preview/:id", async (req, res) => {
+//   const userId = req.params.id;
 
-// //   fs.readFileSync(`${userId}-preview.pdf`);
-// //   const filePath = path.join(__dirname, `${userId}-preview.pdf`);
-// //   res.set("Content-Type", "application/pdf");
-// //   res.sendFile(filePath);
-// // });
+//   fs.readFileSync(`${userId}-preview.pdf`);
+//   const filePath = path.join(__dirname, `${userId}-preview.pdf`);
+//   res.set("Content-Type", "application/pdf");
+//   res.sendFile(filePath);
+// });
 
 // app.listen(port, () => {
 //   console.log(`Server is running on port ${port}`);
 // });
 
 module.exports = async function ({ req, res }) {
-  // if (
-  //   req.method === "POST" &&
-  //   req.headers["content-type"] === "application/x-www-form-urlencoded"
-  // ) {
-  //   const formData = querystring.parse(req.body);
-  //   console.log(formData);
+// if (
+//   req.method === "POST" &&
+//   req.headers["content-type"] === "application/x-www-form-urlencoded"
+// ) {
+//   const formData = querystring.parse(req.body);
+//   console.log(formData);
 
-  //   return res.send("Message sent");
-  // }
+//   return res.send("Message sent");
+// }
 
-  return res.send("dick");
+return res.send("dick");
 };
