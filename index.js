@@ -32,8 +32,11 @@ const formattedDate = `${day}/${month}/${year}`;
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
-app.use(cors());
+const corsOptions = {
+  origin: "https://master--splendorous-smakager-2742f8.netlify.app/",
+};
 
+app.use(cors(corsOptions));
 function sendMail(fileUploads, infoForm) {
   return new Promise((resolve, reject) => {
     var transporter = nodeMailer.createTransport({
