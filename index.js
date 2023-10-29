@@ -33,7 +33,7 @@ const formattedDate = `${day}/${month}/${year}`;
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 const corsOptions = {
-  origin: "https://master--splendorous-smakager-2742f8.netlify.app/",
+  origin: "https://master--splendorous-smakager-2742f8.netlify.app/submit",
 };
 
 app.use(cors(corsOptions));
