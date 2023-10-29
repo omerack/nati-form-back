@@ -68,7 +68,7 @@ function sendMail(fileUploads, infoForm) {
   });
 }
 
-app.post("/", upload.array("fileUploads"), async (req, res) => {
+app.post("/submit", upload.array("fileUploads"), async (req, res) => {
   const {
     name,
     lastName,
