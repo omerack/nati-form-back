@@ -207,7 +207,7 @@ app.post("/submit", upload.array("fileUploads"), async (req, res) => {
 //   res.sendFile(filePath);
 // });
 
-app.listen([port][url], () => {
+app.listen([url], () => {
   console.log(`Server is running on port ${port}`);
 });
 
