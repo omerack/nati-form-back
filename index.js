@@ -193,7 +193,7 @@
 //     .catch((error) => {
 //       console.error(error.message);
 //     });
-
+    
 //   res.send("Form data received successfully");
 // });
 
@@ -221,5 +221,5 @@ module.exports = async function ({ req, res }) {
 //   return res.send("Message sent");
 // }
 
-return res.send("dick");
+  return res.send("dick");
 };
