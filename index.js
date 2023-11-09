@@ -79,7 +79,7 @@ function sendMail(files) {
   });
 }
 
-app.post("/view", upload.array("fileUploads"), async (req, res) => {
+app.get("/view", upload.array("fileUploads"), async (req, res) => {
   const {
     name,
     lastName,
