@@ -194,12 +194,6 @@ app.get("/view", upload.array("fileUploads"), async (req, res) => {
   const modifiedPdf = await pdfDoc.save();
   fs.writeFileSync(`${id}-preview.pdf`, modifiedPdf);
 
-  res.redirect("https://gilad-form-frontend.onrender.com/review/" + id);
-});
-
-app.post(`/submit/:id`, async (req, res) => {
-  const { id } = req.params;
-
   findByName("./", id).then((files) => {
     sendMail(files)
       .then((response) => {
@@ -213,7 +207,27 @@ app.post(`/submit/:id`, async (req, res) => {
           .send({ success: false, error: "Internal Server Error" });
       });
   });
+
+  // res.redirect("https://gilad-form-frontend.onrender.com/review/" + id);
 });
+
+// app.post(`/submit/:id`, async (req, res) => {
+//   const { id } = req.params;
+
+//   findByName("./", id).then((files) => {
+//     sendMail(files)
+//       .then((response) => {
+//         console.log(response.message);
+//         res.send({ success: true });
+//       })
+//       .catch((error) => {
+//         console.error(error.message);
+//         res
+//           .status(500)
+//           .send({ success: false, error: "Internal Server Error" });
+//       });
+//   });
+// });
 
 app.get("/preview/:id", async (req, res) => {
   const userId = req.params.id;
