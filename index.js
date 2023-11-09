@@ -194,7 +194,7 @@ app.post("/view", upload.array("fileUploads"), async (req, res) => {
   const modifiedPdf = await pdfDoc.save();
   fs.writeFileSync(`${id}-preview.pdf`, modifiedPdf);
 
-  res.redirect("https://gilad-form-frontend.onrender.com/preview/" + id);
+  res.redirect("https://gilad-form-frontend.onrender.com/review/" + id);
 });
 
 app.post(`/submit/:id`, async (req, res) => {
