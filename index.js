@@ -7,14 +7,15 @@ const fontkit = require("@pdf-lib/fontkit");
 const path = require("path");
 const multer = require("multer");
 const nodeMailer = require("nodemailer");
+const { readdir } = require("fs/promises");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./");
+    cb(null, "./src");
   },
   filename: (req, file, cb) => {
     console.log(file);
-    cb(null, path.extname(file.originalname));
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
@@ -34,7 +35,20 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cors());
 
-function sendMail(fileUploads, infoForm) {
+const findByName = async (dir, name) => {
+  const matchedFiles = [];
+
+  const files = await readdir(dir);
+
+  for (const file of files) {
+    if (file.includes(name)) {
+      matchedFiles.push(file);
+    }
+  }
+
+  return matchedFiles;
+};
+function sendMail(files) {
   return new Promise((resolve, reject) => {
     var transporter = nodeMailer.createTransport({
       service: "gmail",
@@ -48,12 +62,9 @@ function sendMail(fileUploads, infoForm) {
       from: "omeracker1@gmail.com",
       to: "omeracker1@gmail.com",
       attachments: [
-        ...fileUploads.map((upload) => ({
+        ...files.map((upload) => ({
           path: upload,
         })),
-        {
-          path: infoForm,
-        },
       ],
       subject: "הודעה חדשה",
       text: "קיבלת פרטים חדשים ",
@@ -68,7 +79,7 @@ function sendMail(fileUploads, infoForm) {
   });
 }
 
-app.post("/submit", upload.array("fileUploads"), async (req, res) => {
+app.post("/", upload.array("fileUploads"), async (req, res) => {
   const {
     name,
     lastName,
@@ -84,7 +95,6 @@ app.post("/submit", upload.array("fileUploads"), async (req, res) => {
     signature,
     fileUploads,
   } = req.body;
-
   const existingPdf = fs.readFileSync("./filepdf.pdf");
   const pdfDoc = await PDFDocument.load(existingPdf);
 
@@ -184,42 +194,36 @@ app.post("/submit", upload.array("fileUploads"), async (req, res) => {
   const modifiedPdf = await pdfDoc.save();
   fs.writeFileSync(`${id}-preview.pdf`, modifiedPdf);
 
-  const infoForm = `${id}-preview.pdf`;
-
-  sendMail(fileUploads, infoForm)
-    .then((response) => {
-      console.log(response.message);
-    })
-    .catch((error) => {
-      console.error(error.message);
-    });
-
-  res.send("Form data received successfully");
+  res.redirect("https://gilad-form-frontend.onrender.com/preview/" + id);
 });
 
-// // app.get("/preview/:id", async (req, res) => {
-// //   const userId = req.params.id;
+app.post(`/submit/:id`, async (req, res) => {
+  const { id } = req.params;
 
-// //   fs.readFileSync(`${userId}-preview.pdf`);
-// //   const filePath = path.join(__dirname, `${userId}-preview.pdf`);
-// //   res.set("Content-Type", "application/pdf");
-// //   res.sendFile(filePath);
-// // });
+  findByName("./", id).then((files) => {
+    sendMail(files)
+      .then((response) => {
+        console.log(response.message);
+        res.send({ success: true });
+      })
+      .catch((error) => {
+        console.error(error.message);
+        res
+          .status(500)
+          .send({ success: false, error: "Internal Server Error" });
+      });
+  });
+});
+
+app.get("/preview/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  fs.readFileSync(`${userId}-preview.pdf`);
+  const filePath = path.join(__dirname, `${userId}-preview.pdf`);
+  res.set("Content-Type", "application/pdf");
+  res.sendFile(filePath);
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
-// module.exports = async function ({ req, res }) {
-  // if (
-  //   req.method === "POST" &&
-  //   req.headers["content-type"] === "application/x-www-form-urlencoded"
-  // ) {
-  //   const formData = querystring.parse(req.body);
-  //   console.log(formData);
-
-  //   return res.send("Message sent");
-  // }
-
-//   return res.send("dick");
-// };
