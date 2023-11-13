@@ -79,7 +79,7 @@ function sendMail(files) {
   });
 }
 
-app.post("/submit", upload.array("fileUploads"), async (req, res) => {
+app.post("/view", upload.array("fileUploads"), async (req, res) => {
   const {
     name,
     lastName,
@@ -194,7 +194,7 @@ app.post("/submit", upload.array("fileUploads"), async (req, res) => {
   const modifiedPdf = await pdfDoc.save();
   fs.writeFileSync(`${id}-preview.pdf`, modifiedPdf);
 
-  res.redirect(`https://gilad-form-frontend.onrender.com/review/${id}`);
+  res.send({ success: true });
 });
 
 app.post(`/submit/:id`, async (req, res) => {
