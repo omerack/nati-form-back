@@ -8,18 +8,7 @@ const path = require("path");
 const multer = require("multer");
 const nodeMailer = require("nodemailer");
 const { readdir } = require("fs/promises");
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./src");
-  },
-  filename: (req, file, cb) => {
-    console.log(file);
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({ storage: storage });
+const fileUpload = require("express-fileupload");
 
 const app = express();
 const port = 3001;
@@ -31,8 +20,12 @@ const year = today.getFullYear();
 
 const formattedDate = `${day}/${month}/${year}`;
 
-app.use(bodyParser.json({ limit: "50mb" }));
-app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
+app.use(express.static("public"));
+app.use(
+  fileUpload({
+    limits: { fileSize: 50 * 1024 * 1024 },
+  })
+);
 app.use(cors());
 
 const findByName = async (dir, name) => {
@@ -53,13 +46,13 @@ function sendMail(files) {
     var transporter = nodeMailer.createTransport({
       service: "gmail",
       auth: {
-        user: "omeracker1@gmail.com",
-        pass: "ulcq loln lbyy qiaw",
+        user: "automaticform.gilad@gmail.com",
+        pass: "vpri iizx vjbl wfxl",
       },
     });
 
     const mail_configs = {
-      from: "omeracker1@gmail.com",
+      from: "automaticform.gilad@gmail.com",
       to: "omeracker1@gmail.com",
       attachments: [
         ...files.map((upload) => ({
@@ -79,7 +72,7 @@ function sendMail(files) {
   });
 }
 
-app.post("/view", upload.array("fileUploads"), async (req, res) => {
+app.post("/view", async (req, res) => {
   const {
     name,
     lastName,
@@ -93,8 +86,8 @@ app.post("/view", upload.array("fileUploads"), async (req, res) => {
     partnerLastName,
     partnerId,
     signature,
-    fileUploads,
   } = req.body;
+
   const existingPdf = fs.readFileSync("./filepdf.pdf");
   const pdfDoc = await PDFDocument.load(existingPdf);
 
@@ -182,17 +175,35 @@ app.post("/view", upload.array("fileUploads"), async (req, res) => {
     height: pngDims.height,
   });
 
-  fileUploads.forEach((imageData, index) => {
-    const base64Data = imageData.replace(/^data:image\/png;base64,/, "");
-
-    fs.writeFile(`${id} ${index + 1}.png`, base64Data, "base64", (err) => {
-      if (err) throw err;
-      console.log(`${name} ${index + 1} has been saved!`);
-    });
-  });
-
   const modifiedPdf = await pdfDoc.save();
   fs.writeFileSync(`${id}-preview.pdf`, modifiedPdf);
+
+  console.log(req.files);
+  const files = req.files["fileUploads[]"];
+
+  if (Array.isArray(files)) {
+    files.forEach((file, index) => {
+      fs.writeFile(
+        `./${id} - ${index + 1}.${file.name.split(".")[1]}`,
+        file.data,
+        (err) => {
+          if (err) {
+            return res.status(500).send(err);
+          }
+        }
+      );
+    });
+  } else {
+    fs.writeFile(
+      `./${id} - 1.${files.name.split(".")[1]}`,
+      files.data,
+      (err) => {
+        if (err) {
+          return res.status(500).send(err);
+        }
+      }
+    );
+  }
 
   res.send({ success: true });
 });
@@ -204,6 +215,17 @@ app.post(`/submit/:id`, async (req, res) => {
     sendMail(files)
       .then((response) => {
         console.log(response.message);
+
+        files.forEach((file) => {
+          fs.unlink(file, (unlinkErr) => {
+            if (unlinkErr) {
+              console.error(`Error deleting file: ${file}`, unlinkErr);
+            } else {
+              console.log(`Deleted file: ${file}`);
+            }
+          });
+        });
+
         res.send({ success: true });
       })
       .catch((error) => {
