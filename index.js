@@ -53,7 +53,7 @@ function sendMail(files) {
 
     const mail_configs = {
       from: "automaticform.gilad@gmail.com",
-      to: "giladac@gmail.com",
+      to: "omeracker1@gmail.com",
       attachments: [
         ...files.map((upload) => ({
           path: upload,
@@ -123,9 +123,9 @@ app.post("/view", async (req, res) => {
     borderColor: rgb(1, 1, 1),
   });
   newPdf.drawText(email, { x: 50, y: 590, size: 15, font: customFont });
-  newPdf.drawText(street, { x: 400, y: 590, size: 15, font: customFont });
-  newPdf.drawText(streetNumber, { x: 380, y: 590, size: 15, font: customFont });
-  newPdf.drawText(city, { x: 330, y: 590, size: 15, font: customFont });
+  newPdf.drawText(street, { x: 410, y: 590, size: 15, font: customFont });
+  newPdf.drawText(streetNumber, { x: 390, y: 590, size: 15, font: customFont });
+  newPdf.drawText(city, { x: 270, y: 590, size: 15, font: customFont });
   partnerName &&
     newPdf.drawText(partnerName, {
       x: 330,
