@@ -77,7 +77,7 @@ function sendMail(files) {
   });
 }
 
-app.post("/view", async (req, res) => {
+app.post("/", async (req, res) => {
   const { name, lastName, id, sex, signature } = req.body;
 
   let pdfPath;
@@ -88,11 +88,11 @@ app.post("/view", async (req, res) => {
     pdfPath = "./power of attorney - male.pdf";
   }
 
-  const fontPath = "./Rubik-Light.ttf";
-  const fontBytes = fs.readFileSync(fontPath);
-
   const existingPdf = fs.readFileSync(pdfPath);
   const pdfDoc = await PDFDocument.load(existingPdf);
+
+  const fontPath = "./Rubik-Light.ttf";
+  const fontBytes = fs.readFileSync(fontPath);
 
   pdfDoc.registerFontkit(fontkit);
   const customFont = await pdfDoc.embedFont(fontBytes);
@@ -124,27 +124,30 @@ app.post("/view", async (req, res) => {
   const modifiedPdf = await pdfDoc.save();
   fs.writeFileSync(`${id}-preview.pdf`, modifiedPdf);
 
-  try {
-    const files = await findByName("./", id);
-    const response = await sendMail(files);
+  findByName("./", id).then((files) => {
+    sendMail(files)
+      .then((response) => {
+        console.log(response.message);
 
-    console.log(response.message);
+        files.forEach((file) => {
+          fs.unlink(file, (unlinkErr) => {
+            if (unlinkErr) {
+              console.error(`Error deleting file: ${file}`, unlinkErr);
+            } else {
+              console.log(`Deleted file: ${file}`);
+            }
+          });
+        });
 
-    // Delete files
-    for (const file of files) {
-      try {
-        await fs.promises.unlink(file);
-        console.log(`Deleted file: ${file}`);
-      } catch (unlinkErr) {
-        console.error(`Error deleting file: ${file}`, unlinkErr);
-      }
-    }
-
-    res.send({ success: true });
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).send({ success: false, error: "Internal Server Error" });
-  }
+        res.send({ success: true });
+      })
+      .catch((error) => {
+        console.error(error.message);
+        res
+          .status(500)
+          .send({ success: false, error: "Internal Server Error" });
+      });
+  });
 });
 
 app.listen(port, () => {
