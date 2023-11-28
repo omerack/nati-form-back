@@ -78,7 +78,7 @@ function sendMail(files) {
 }
 
 app.post("/submit", async (req, res) => {
-  const { name, lastName, id, sex, signature } = req.body;
+  const { name, id, sex, signature } = req.body;
   console.log(req.body);
 
   let pdfPath;
@@ -99,11 +99,9 @@ app.post("/submit", async (req, res) => {
   const customFont = await pdfDoc.embedFont(fontBytes);
 
   const newPdf = pdfDoc.getPages()[0];
-  newPdf.drawText(name, { x: 493, y: 783, size: 12, font: customFont });
-  newPdf.drawText(lastName, { x: 460, y: 783, size: 12, font: customFont });
-  newPdf.drawText(name, { x: 150, y: 150, size: 12, font: customFont });
-  newPdf.drawText(lastName, { x: 117, y: 150, size: 12, font: customFont });
-  newPdf.drawText(id, { x: 365, y: 783, size: 11, font: customFont });
+  newPdf.drawText(name, { x: 450, y: 784, size: 10, font: customFont });
+  newPdf.drawText(name, { x: 105, y: 150, size: 12, font: customFont });
+  newPdf.drawText(id, { x: 369, y: 784, size: 11, font: customFont });
   newPdf.drawText(`${day}`, { x: 320, y: 184, size: 11, font: customFont });
   newPdf.drawText(`${year}`, { x: 170, y: 184, size: 11, font: customFont });
   newPdf.drawText(`${monthsNames[month]}`, {
@@ -125,30 +123,32 @@ app.post("/submit", async (req, res) => {
   const modifiedPdf = await pdfDoc.save();
   fs.writeFileSync(`${id}-preview.pdf`, modifiedPdf);
 
-  findByName("./", id).then((files) => {
-    sendMail(files)
-      .then((response) => {
-        console.log(response.message);
+  findByName("./", id)
+    .then((files) => {
+      sendMail(files)
+        .then((response) => {
+          console.log(response.message);
 
-        files.forEach((file) => {
-          fs.unlink(file, (unlinkErr) => {
-            if (unlinkErr) {
-              console.error(`Error deleting file: ${file}`, unlinkErr);
-            } else {
-              console.log(`Deleted file: ${file}`);
-            }
+          files.forEach((file) => {
+            fs.unlink(file, (unlinkErr) => {
+              if (unlinkErr) {
+                console.error(`Error deleting file: ${file}`, unlinkErr);
+              } else {
+                console.log(`Deleted file: ${file}`);
+              }
+            });
           });
-        });
 
-        res.send({ success: true });
-      })
-      .catch((error) => {
-        console.error(error.message);
-        res
-          .status(500)
-          .send({ success: false, error: "Internal Server Error" });
-      });
-  });
+          res.send({ success: true });
+        })
+        .catch((error) => {
+          console.error(error.message);
+          res
+            .status(500)
+            .send({ success: false, error: "Internal Server Error" });
+        });
+    })
+    .catch((error) => console.log(error));
 });
 
 app.listen(port, () => {
