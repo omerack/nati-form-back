@@ -101,9 +101,9 @@ app.post("/submit", async (req, res) => {
   const customFont = await pdfDoc.embedFont(fontBytes);
 
   const newPdf = pdfDoc.getPages()[0];
-  newPdf.drawText(name, { x: 450, y: 784, size: 10, font: customFont });
+  newPdf.drawText(name, { x: 420, y: 785, size: 10, font: customFont });
   newPdf.drawText(name, { x: 105, y: 150, size: 12, font: customFont });
-  newPdf.drawText(id, { x: 369, y: 784, size: 11, font: customFont });
+  newPdf.drawText(id, { x: 303, y: 785, size: 11, font: customFont });
   newPdf.drawText(`${day}`, { x: 320, y: 184, size: 11, font: customFont });
   newPdf.drawText(`${year}`, { x: 170, y: 184, size: 11, font: customFont });
   newPdf.drawText(`${monthsNames[month]}`, {
