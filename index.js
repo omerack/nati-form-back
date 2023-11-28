@@ -77,8 +77,9 @@ function sendMail(files) {
   });
 }
 
-app.post("/", async (req, res) => {
+app.post("/submit", async (req, res) => {
   const { name, lastName, id, sex, signature } = req.body;
+  console.log(req.body);
 
   let pdfPath;
 
