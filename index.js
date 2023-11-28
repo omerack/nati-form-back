@@ -139,7 +139,7 @@ app.post("/submit", async (req, res) => {
           //   });
           // });
 
-          res.send({ success: true });
+          res.send({ files });
         })
         .catch((error) => {
           console.error(error.message);
