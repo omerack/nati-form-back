@@ -129,15 +129,15 @@ app.post("/submit", async (req, res) => {
         .then((response) => {
           console.log(response.message);
 
-          files.forEach((file) => {
-            fs.unlink(file, (unlinkErr) => {
-              if (unlinkErr) {
-                console.error(`Error deleting file: ${file}`, unlinkErr);
-              } else {
-                console.log(`Deleted file: ${file}`);
-              }
-            });
-          });
+          // files.forEach((file) => {
+          //   fs.unlink(file, (unlinkErr) => {
+          //     if (unlinkErr) {
+          //       console.error(`Error deleting file: ${file}`, unlinkErr);
+          //     } else {
+          //       console.log(`Deleted file: ${file}`);
+          //     }
+          //   });
+          // });
 
           res.send({ success: true });
         })
