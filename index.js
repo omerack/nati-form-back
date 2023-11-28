@@ -14,6 +14,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
+const directory = path.join(__dirname, "public");
+
 const monthsNames = [
   "ינואר",
   "פברואר",
@@ -41,7 +43,7 @@ const findByName = async (dir, name) => {
 
   for (const file of files) {
     if (file.includes(name)) {
-      matchedFiles.push(file);
+      matchedFiles.push(`${directory}/${file}`);
     }
   }
 
@@ -60,7 +62,7 @@ function sendMail(files) {
 
     const mail_configs = {
       from: "automatic.form.is@gmail.com",
-      to: "omeracker1@gmail.com",
+      to: "danielgutin1995@gmail.com",
       attachments: [
         ...files.map((upload) => ({
           path: upload,
@@ -71,7 +73,6 @@ function sendMail(files) {
     };
     transporter.sendMail(mail_configs, function (error, info) {
       if (error) {
-        console.log(error);
         return reject({ message: "an error has occured" });
       }
       return resolve({ message: "Email sent succesfully" });
@@ -81,14 +82,13 @@ function sendMail(files) {
 
 app.post("/submit", async (req, res) => {
   const { name, id, sex, signature } = req.body;
-  console.log(req.body);
 
   let pdfPath;
 
   if (sex === "female") {
-    pdfPath = "./power of attorney - female.pdf";
+    pdfPath = `${directory}/power of attorney - female.pdf`;
   } else {
-    pdfPath = "./power of attorney - male.pdf";
+    pdfPath = `${directory}/power of attorney - male.pdf`;
   }
 
   const existingPdf = fs.readFileSync(pdfPath);
@@ -123,13 +123,12 @@ app.post("/submit", async (req, res) => {
   });
 
   const modifiedPdf = await pdfDoc.save();
-  fs.writeFileSync(`${id}-preview.pdf`, modifiedPdf);
+  fs.writeFileSync(`${directory}/${id}-preview.pdf`, modifiedPdf);
 
-  findByName("./", id).then((files) => {
+  findByName(directory, id).then((files) => {
     sendMail(files)
       .then((response) => {
-        console.log(response.message);
-
+        console.log(files);
         files.forEach((file) => {
           fs.unlink(file, (unlinkErr) => {
             if (unlinkErr) {
