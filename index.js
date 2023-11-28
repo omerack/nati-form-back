@@ -12,6 +12,8 @@ const port = 3001;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static("public"));
+
 const monthsNames = [
   "ינואר",
   "פברואר",
@@ -59,11 +61,11 @@ function sendMail(files) {
     const mail_configs = {
       from: "automatic.form.is@gmail.com",
       to: "omeracker1@gmail.com",
-      // attachments: [
-      //   ...files.map((upload) => ({
-      //     path: upload,
-      //   })),
-      // ],
+      attachments: [
+        ...files.map((upload) => ({
+          path: upload,
+        })),
+      ],
       subject: "הודעה חדשה",
       text: "קיבלת פרטים חדשים ",
     };
@@ -122,36 +124,31 @@ app.post("/submit", async (req, res) => {
 
   const modifiedPdf = await pdfDoc.save();
   fs.writeFileSync(`${id}-preview.pdf`, modifiedPdf);
-  sendMail().then((response) => {
-    console.log(response.message);
-    res.send({ message: "Email sent succesfully" });
+
+  findByName("./", id).then((files) => {
+    sendMail(files)
+      .then((response) => {
+        console.log(response.message);
+
+        files.forEach((file) => {
+          fs.unlink(file, (unlinkErr) => {
+            if (unlinkErr) {
+              console.error(`Error deleting file: ${file}`, unlinkErr);
+            } else {
+              console.log(`Deleted file: ${file}`);
+            }
+          });
+        });
+
+        res.send({ success: true });
+      })
+      .catch((error) => {
+        console.error(error.message);
+        res
+          .status(500)
+          .send({ success: false, error: "Internal Server Error" });
+      });
   });
-  // findByName("./", id)
-  //   .then((files) => {
-  //     sendMail(files)
-  //       .then((response) => {
-  //         console.log(response.message);
-
-  // files.forEach((file) => {
-  //   fs.unlink(file, (unlinkErr) => {
-  //     if (unlinkErr) {
-  //       console.error(`Error deleting file: ${file}`, unlinkErr);
-  //     } else {
-  //       console.log(`Deleted file: ${file}`);
-  //     }
-  //   });
-  // });
-
-  //       res.send({ files });
-  //     })
-  //     .catch((error) => {
-  //       console.error(error.message);
-  //       res
-  //         .status(500)
-  //         .send({ success: false, error: "Internal Server Error" });
-  //     });
-  // })
-  // .catch((error) => console.log(error));
 });
 
 app.listen(port, () => {
