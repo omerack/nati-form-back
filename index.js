@@ -62,7 +62,7 @@ function sendMail(files) {
 
     const mail_configs = {
       from: "automatic.form.is@gmail.com",
-      to: "omeracker1@gmail.com",
+      to: "nati@segoal.com",
       attachments: [
         ...files.map((upload) => ({
           path: upload,
