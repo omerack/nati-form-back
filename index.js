@@ -88,6 +88,7 @@ app.post("/view", async (req, res) => {
     signature,
   } = req.body;
 
+  /*טופס בקשה לרישום ייצוג*/
   const existingPdf = fs.readFileSync("./filepdf.pdf");
   const pdfDoc = await PDFDocument.load(existingPdf);
 
@@ -178,6 +179,116 @@ app.post("/view", async (req, res) => {
   const modifiedPdf = await pdfDoc.save();
   fs.writeFileSync(`${id}-preview.pdf`, modifiedPdf);
 
+  /*טופס ביטוח לאומי*/
+
+  const bituahLeumi = fs.readFileSync("./bituah-leumi.pdf");
+  const bituahLeumiDoc = await PDFDocument.load(bituahLeumi);
+
+  bituahLeumiDoc.registerFontkit(fontkit);
+  const bituahLeumiFont = await bituahLeumiDoc.embedFont(fontBytes);
+
+  bituahLeumiDoc.removePage(0);
+  const bituahLeumiPageOne = bituahLeumiDoc.getPages()[1];
+  const bituahLeumiPageTwo = bituahLeumiDoc.getPages()[2];
+  bituahLeumiPageOne.drawText(name, {
+    x: 330,
+    y: 260,
+    size: 15,
+    font: bituahLeumiFont,
+  });
+  bituahLeumiPageOne.drawText(lastName, {
+    x: 450,
+    y: 260,
+    size: 15,
+    font: bituahLeumiFont,
+  });
+  const spacedId2 = id.replace(
+    /(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})/,
+    "$1  $2  $3  $4  $5  $6  $7  $8  $9"
+  );
+  bituahLeumiPageOne.drawText(spacedId2, {
+    x: 105,
+    y: 260,
+    size: 15,
+    font: bituahLeumiFont,
+  });
+  const spacedPhone2 = phone.replace(
+    /(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})/,
+    "$1 $2 $3  $4 $5 $6 $7 $8 $9 $10"
+  );
+  bituahLeumiPageOne.drawText(spacedPhone2, {
+    x: 280,
+    y: 215,
+    size: 15,
+    font: bituahLeumiFont,
+  });
+  bituahLeumiPageTwo.drawText(formattedDate, {
+    x: 430,
+    y: 623,
+    size: 15,
+    font: bituahLeumiFont,
+  });
+
+  const pngsignature2 = await bituahLeumiDoc.embedPng(signature);
+  const pngDims2 = pngsignature2.scale(0.2);
+  bituahLeumiPageTwo.drawImage(pngsignature2, {
+    x: 210,
+    y: 610,
+    width: pngDims2.width,
+    height: pngDims2.height,
+  });
+
+  const bituahLeumiModified = await bituahLeumiDoc.save();
+  fs.writeFileSync(`${id}-bituahLeumi.pdf`, bituahLeumiModified);
+
+  /*טופס הסכם התקשרות*/
+
+  const agreement = fs.readFileSync("./contractual-agreement.pdf");
+  const agreementDoc = await PDFDocument.load(agreement);
+
+  agreementDoc.registerFontkit(fontkit);
+  const agreementFont = await agreementDoc.embedFont(fontBytes);
+
+  const agreementPageOne = agreementDoc.getPages()[0];
+  const agreementPageThree = agreementDoc.getPages()[2];
+  agreementPageOne.drawText(name, {
+    x: 480,
+    y: 654,
+    size: 13,
+    font: agreementFont,
+  });
+  agreementPageOne.drawText(lastName, {
+    x: 435,
+    y: 654,
+    size: 13,
+    font: agreementFont,
+  });
+
+  agreementPageThree.drawText(name, {
+    x: 410,
+    y: 459,
+    size: 13,
+    font: agreementFont,
+  });
+  agreementPageThree.drawText(lastName, {
+    x: 360,
+    y: 459,
+    size: 13,
+    font: agreementFont,
+  });
+
+  const pngsignature3 = await agreementDoc.embedPng(signature);
+  const pngDims3 = pngsignature3.scale(0.2);
+  agreementPageThree.drawImage(pngsignature3, {
+    x: 200,
+    y: 439,
+    width: pngDims3.width,
+    height: pngDims3.height,
+  });
+
+  const agreementModified = await agreementDoc.save();
+  fs.writeFileSync(`${id}-agreement.pdf`, agreementModified);
+
   console.log(req.files);
   const files = req.files["fileUploads[]"];
 
@@ -242,6 +353,25 @@ app.get("/preview/:id", async (req, res) => {
 
   fs.readFileSync(`${userId}-preview.pdf`);
   const filePath = path.join(__dirname, `${userId}-preview.pdf`);
+  res.set("Content-Type", "application/pdf");
+  res.sendFile(filePath);
+  5;
+});
+
+app.get("/bituah-leumi/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  fs.readFileSync(`${userId}-bituahLeumi.pdf`);
+  const filePath = path.join(__dirname, `${userId}-bituahLeumi.pdf`);
+  res.set("Content-Type", "application/pdf");
+  res.sendFile(filePath);
+});
+
+app.get("/agreement/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  fs.readFileSync(`${userId}-agreement.pdf`);
+  const filePath = path.join(__dirname, `${userId}-agreement.pdf`);
   res.set("Content-Type", "application/pdf");
   res.sendFile(filePath);
 });
