@@ -5,7 +5,6 @@ const { PDFDocument, rgb } = require("pdf-lib");
 const fs = require("fs");
 const fontkit = require("@pdf-lib/fontkit");
 const path = require("path");
-const multer = require("multer");
 const nodeMailer = require("nodemailer");
 const { readdir } = require("fs/promises");
 const fileUpload = require("express-fileupload");
@@ -41,6 +40,7 @@ const findByName = async (dir, name) => {
 
   return matchedFiles;
 };
+
 function sendMail(files) {
   return new Promise((resolve, reject) => {
     var transporter = nodeMailer.createTransport({
