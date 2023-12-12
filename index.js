@@ -321,10 +321,9 @@ app.post("/view", async (req, res) => {
 
 app.get("/preview/:id", async (req, res) => {
   const userId = req.params.id;
-  console.log(userId);
 
-  fs.readFileSync(`${userId}-preview.pdf`);
-  const filePath = path.join(__dirname, `${userId}-preview.pdf`);
+  fs.readFileSync(`${userId}-bituahLeumi.pdf`);
+  const filePath = path.join(__dirname, `${userId}-bituahLeumi.pdf`);
   res.set("Content-Type", "application/pdf");
   res.sendFile(filePath);
 });
@@ -340,7 +339,6 @@ app.get("/bituahLeumi/:id", async (req, res) => {
 
 app.get("/agreement/:id", async (req, res) => {
   const userId = req.params.id;
-  console.log(userId);
 
   fs.readFileSync(`${userId}-agreement.pdf`);
   const filePath = path.join(__dirname, `${userId}-agreement.pdf`);
