@@ -326,7 +326,6 @@ app.get("/preview/:id", async (req, res) => {
   const filePath = path.join(__dirname, `${userId}-preview.pdf`);
   res.set("Content-Type", "application/pdf");
   res.sendFile(filePath);
-  5;
 });
 
 app.get("/bituahLeumi/:id", async (req, res) => {
@@ -375,8 +374,6 @@ app.post(`/submit/:id`, async (req, res) => {
       });
   });
 });
-
-
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
