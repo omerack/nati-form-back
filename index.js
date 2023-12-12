@@ -263,6 +263,20 @@ app.post("/view", async (req, res) => {
     size: 13,
     font: agreementFont,
   });
+  agreementPageOne.drawRectangle({
+    x: 80,
+    y: 700,
+    width: 58,
+    height: 20,
+    color: rgb(1, 1, 1),
+    borderColor: rgb(1, 1, 1),
+  });
+  agreementPageOne.drawText(formattedDate, {
+    x: 80,
+    y: 703,
+    size: 11,
+    font: agreementFont,
+  });
 
   agreementPageThree.drawText(name, {
     x: 410,
