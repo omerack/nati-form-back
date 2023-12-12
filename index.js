@@ -331,20 +331,15 @@ app.get("/preview/:id", async (req, res) => {
 app.get("/bituahLeumi/:id", async (req, res) => {
   const userId = req.params.id;
 
-  try {
-    const filePath = path.join(__dirname, `${userId}-bituahLeumi.pdf`);
-    const fileContents = fs.readFileSync(filePath);
-
-    res.set("Content-Type", "application/pdf");
-    res.send(fileContents);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal Server Error");
-  }
+  fs.readFileSync(`${userId}-bituahLeumi.pdf`);
+  const filePath = path.join(__dirname, `${userId}-bituahLeumi.pdf`);
+  res.set("Content-Type", "application/pdf");
+  res.sendFile(filePath);
 });
 
 app.get("/agreement/:id", async (req, res) => {
   const userId = req.params.id;
+  console.log(userId);
 
   fs.readFileSync(`${userId}-agreement.pdf`);
   const filePath = path.join(__dirname, `${userId}-agreement.pdf`);
