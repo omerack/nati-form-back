@@ -321,6 +321,7 @@ app.post("/view", async (req, res) => {
 
 app.get("/preview/:id", async (req, res) => {
   const userId = req.params.id;
+  console.log(userId);
 
   fs.readFileSync(`${userId}-preview.pdf`);
   const filePath = path.join(__dirname, `${userId}-preview.pdf`);
