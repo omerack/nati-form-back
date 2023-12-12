@@ -319,14 +319,14 @@ app.post("/view", async (req, res) => {
   res.send({ success: true });
 });
 
-// app.get("/preview/:id", async (req, res) => {
-//   const userId = req.params.id;
+app.get("/preview/:id", async (req, res) => {
+  const userId = req.params.id;
 
-//   fs.readFileSync(`${userId}-bituahLeumi.pdf`);
-//   const filePath = path.join(__dirname, `${userId}-bituahLeumi.pdf`);
-//   res.set("Content-Type", "application/pdf");
-//   res.sendFile(filePath);
-// });
+  fs.readFileSync(`${userId}-preview.pdf`);
+  const filePath = path.join(__dirname, `${userId}-preview.pdf`);
+  res.set("Content-Type", "application/pdf");
+  res.sendFile(filePath);
+});
 
 app.get("/bituahLeumi/:id", async (req, res) => {
   const userId = req.params.id;
