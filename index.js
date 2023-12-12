@@ -319,6 +319,34 @@ app.post("/view", async (req, res) => {
   res.send({ success: true });
 });
 
+app.get("/preview/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  fs.readFileSync(`${userId}-preview.pdf`);
+  const filePath = path.join(__dirname, `${userId}-preview.pdf`);
+  res.set("Content-Type", "application/pdf");
+  res.sendFile(filePath);
+  5;
+});
+
+app.get("/bituahLeumi/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  fs.readFileSync(`${userId}-bituahLeumi.pdf`);
+  const filePath = path.join(__dirname, `${userId}-bituahLeumi.pdf`);
+  res.set("Content-Type", "application/pdf");
+  res.sendFile(filePath);
+});
+
+app.get("/agreement/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  fs.readFileSync(`${userId}-agreement.pdf`);
+  const filePath = path.join(__dirname, `${userId}-agreement.pdf`);
+  res.set("Content-Type", "application/pdf");
+  res.sendFile(filePath);
+});
+
 app.post(`/submit/:id`, async (req, res) => {
   const { id } = req.params;
 
@@ -348,33 +376,7 @@ app.post(`/submit/:id`, async (req, res) => {
   });
 });
 
-app.get("/preview/:id", async (req, res) => {
-  const userId = req.params.id;
 
-  fs.readFileSync(`${userId}-preview.pdf`);
-  const filePath = path.join(__dirname, `${userId}-preview.pdf`);
-  res.set("Content-Type", "application/pdf");
-  res.sendFile(filePath);
-  5;
-});
-
-app.get("/bituah-leumi/:id", async (req, res) => {
-  const userId = req.params.id;
-
-  fs.readFileSync(`${userId}-bituahLeumi.pdf`);
-  const filePath = path.join(__dirname, `${userId}-bituahLeumi.pdf`);
-  res.set("Content-Type", "application/pdf");
-  res.sendFile(filePath);
-});
-
-app.get("/agreement/:id", async (req, res) => {
-  const userId = req.params.id;
-
-  fs.readFileSync(`${userId}-agreement.pdf`);
-  const filePath = path.join(__dirname, `${userId}-agreement.pdf`);
-  res.set("Content-Type", "application/pdf");
-  res.sendFile(filePath);
-});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
