@@ -16,8 +16,10 @@ const today = new Date();
 const day = today.getDate();
 const month = today.getMonth() + 1;
 const year = today.getFullYear();
-
 const formattedDate = `${day}/${month}/${year}`;
+
+const fontPath = "./Rubik-Light.ttf";
+const fontBytes = fs.readFileSync(fontPath);
 
 app.use(express.static("public"));
 app.use(
@@ -53,7 +55,7 @@ function sendMail(files) {
 
     const mail_configs = {
       from: "automaticform.gilad@gmail.com",
-      to: "Office@cpa-ag.co.il",
+      to: "omeracker1@gmail.com", //*Office@cpa-ag.co.il*//
       attachments: [
         ...files.map((upload) => ({
           path: upload,
@@ -91,9 +93,6 @@ app.post("/view", async (req, res) => {
   /*טופס בקשה לרישום ייצוג*/
   const existingPdf = fs.readFileSync("./filepdf.pdf");
   const pdfDoc = await PDFDocument.load(existingPdf);
-
-  const fontPath = "./Rubik-Light.ttf";
-  const fontBytes = fs.readFileSync(fontPath);
 
   pdfDoc.registerFontkit(fontkit);
   const customFont = await pdfDoc.embedFont(fontBytes);
@@ -263,14 +262,6 @@ app.post("/view", async (req, res) => {
     size: 13,
     font: agreementFont,
   });
-  agreementPageOne.drawRectangle({
-    x: 80,
-    y: 700,
-    width: 58,
-    height: 20,
-    color: rgb(1, 1, 1),
-    borderColor: rgb(1, 1, 1),
-  });
   agreementPageOne.drawText(formattedDate, {
     x: 80,
     y: 703,
@@ -303,7 +294,128 @@ app.post("/view", async (req, res) => {
   const agreementModified = await agreementDoc.save();
   fs.writeFileSync(`${id}-agreement.pdf`, agreementModified);
 
-  console.log(req.files);
+  /*טופס שירותי הנהלת חשבונות*/
+
+  const BookKeeping = fs.readFileSync("./BookKeeping.pdf");
+  const BookKeepingDoc = await PDFDocument.load(BookKeeping);
+
+  BookKeepingDoc.registerFontkit(fontkit);
+  const BookKeepingFont = await BookKeepingDoc.embedFont(fontBytes);
+
+  const BookKeepingPageOne = BookKeepingDoc.getPages()[0];
+  const BookKeepingPageTwo = BookKeepingDoc.getPages()[1];
+
+  BookKeepingPageOne.drawText(name, {
+    x: 330,
+    y: 569,
+    size: 13,
+    font: BookKeepingFont,
+  });
+  BookKeepingPageOne.drawText(lastName, {
+    x: 290,
+    y: 569,
+    size: 13,
+    font: BookKeepingFont,
+  });
+  BookKeepingPageOne.drawText(formattedDate, {
+    x: 87,
+    y: 716,
+    size: 13,
+    font: BookKeepingFont,
+  });
+  BookKeepingPageOne.drawText(`${day}`, {
+    x: 315,
+    y: 648,
+    size: 11,
+    font: BookKeepingFont,
+  });
+  BookKeepingPageOne.drawText(`${month}`, {
+    x: 268,
+    y: 648,
+    size: 11,
+    font: BookKeepingFont,
+  });
+
+  BookKeepingPageOne.drawText(`${year}`, {
+    x: 215,
+    y: 648,
+    size: 11,
+    font: BookKeepingFont,
+  });
+
+  const pngsignature5 = await BookKeepingDoc.embedPng(signature);
+  const pngDims5 = pngsignature5.scale(0.2);
+  BookKeepingPageTwo.drawImage(pngsignature5, {
+    x: 380,
+    y: 430,
+    width: pngDims5.width,
+    height: pngDims5.height,
+  });
+
+  const BookKeepingModified = await BookKeepingDoc.save();
+  fs.writeFileSync(`${id}-BookKeeping.pdf`, BookKeepingModified);
+
+  /*טופס שירות דוח כספי*/
+
+  const financialReport = fs.readFileSync("./financialReport.pdf");
+  const financialReportDoc = await PDFDocument.load(financialReport);
+
+  financialReportDoc.registerFontkit(fontkit);
+  const financialReportFont = await financialReportDoc.embedFont(fontBytes);
+
+  const financialReportPageOne = financialReportDoc.getPages()[0];
+  const financialReportPageTwo = financialReportDoc.getPages()[1];
+
+  financialReportPageOne.drawText(name, {
+    x: 340,
+    y: 590,
+    size: 13,
+    font: financialReportFont,
+  });
+  financialReportPageOne.drawText(lastName, {
+    x: 300,
+    y: 590,
+    size: 13,
+    font: financialReportFont,
+  });
+  financialReportPageOne.drawText(formattedDate, {
+    x: 87,
+    y: 718,
+    size: 13,
+    font: financialReportFont,
+  });
+  financialReportPageOne.drawText(`${day}`, {
+    x: 318,
+    y: 654,
+    size: 11,
+    font: financialReportFont,
+  });
+  financialReportPageOne.drawText(`${month}`, {
+    x: 268,
+    y: 654,
+    size: 11,
+    font: financialReportFont,
+  });
+
+  financialReportPageOne.drawText(`${year}`, {
+    x: 210,
+    y: 654,
+    size: 11,
+    font: financialReportFont,
+  });
+
+  const pngsignature4 = await financialReportDoc.embedPng(signature);
+  const pngDims4 = pngsignature4.scale(0.2);
+  financialReportPageTwo.drawImage(pngsignature4, {
+    x: 380,
+    y: 570,
+    width: pngDims4.width,
+    height: pngDims4.height,
+  });
+
+  const financialReportModified = await financialReportDoc.save();
+  fs.writeFileSync(`${id}-financialReport.pdf`, financialReportModified);
+
   const files = req.files["fileUploads[]"];
 
   if (Array.isArray(files)) {
@@ -360,6 +472,38 @@ app.get("/agreement/:id", async (req, res) => {
   res.sendFile(filePath);
 });
 
+app.get("/BookKeeping/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  fs.readFileSync(`${userId}-BookKeeping.pdf`);
+  const filePath = path.join(__dirname, `${userId}-BookKeeping.pdf`);
+  res.set("Content-Type", "application/pdf");
+  res.sendFile(filePath);
+});
+
+app.get("/financialReport/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  fs.readFileSync(`${userId}-financialReport.pdf`);
+  const filePath = path.join(__dirname, `${userId}-financialReport.pdf`);
+  res.set("Content-Type", "application/pdf");
+  res.sendFile(filePath);
+});
+
+app.get("/BookKeeping", async (req, res) => {
+  fs.readFileSync(`BookKeeping.pdf`);
+  const filePath = path.join(__dirname, `BookKeeping.pdf`);
+  res.set("Content-Type", "application/pdf");
+  res.sendFile(filePath);
+});
+
+app.get("/financialReport", async (req, res) => {
+  fs.readFileSync(`financialReport.pdf`);
+  const filePath = path.join(__dirname, `financialReport.pdf`);
+  res.set("Content-Type", "application/pdf");
+  res.sendFile(filePath);
+});
+
 app.post(`/submit/:id`, async (req, res) => {
   const { id } = req.params;
 
@@ -387,6 +531,55 @@ app.post(`/submit/:id`, async (req, res) => {
           .send({ success: false, error: "Internal Server Error" });
       });
   });
+});
+
+app.post("/financialReport/changeFee", async (req, res) => {
+  const { financialReportFee } = req.body;
+  console.log(financialReportFee);
+
+  const financialReport = fs.readFileSync("./feeChange-financialReport.pdf");
+  const financialReportDoc = await PDFDocument.load(financialReport);
+
+  financialReportDoc.registerFontkit(fontkit);
+  const financialReportFont = await financialReportDoc.embedFont(fontBytes);
+
+  const financialReportPageTwo = financialReportDoc.getPages()[1];
+
+  financialReportPageTwo.drawText(financialReportFee, {
+    x: 210,
+    y: 680,
+    size: 13,
+    font: financialReportFont,
+  });
+
+  const financialReportModified = await financialReportDoc.save();
+  fs.writeFileSync(`financialReport.pdf`, financialReportModified);
+
+  res.send({ success: true });
+});
+
+app.post("/BookKeeping/changeFee", async (req, res) => {
+  const { BookKeepingFee } = req.body;
+  console.log(BookKeepingFee);
+
+  const BookKeeping = fs.readFileSync("./feeChange-BookKeeping.pdf");
+  const BookKeepingDoc = await PDFDocument.load(BookKeeping);
+
+  BookKeepingDoc.registerFontkit(fontkit);
+  const BookKeepingFont = await BookKeepingDoc.embedFont(fontBytes);
+
+  const BookKeepingPageTwo = BookKeepingDoc.getPages()[1];
+  BookKeepingPageTwo.drawText(BookKeepingFee, {
+    x: 179,
+    y: 593,
+    size: 12,
+    font: BookKeepingFont,
+  });
+
+  const BookKeepingModified = await BookKeepingDoc.save();
+  fs.writeFileSync(`BookKeeping.pdf`, BookKeepingModified);
+
+  res.send({ success: true });
 });
 
 app.listen(port, () => {
