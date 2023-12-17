@@ -62,7 +62,7 @@ function sendMail(files) {
 
     const mail_configs = {
       from: "automatic.form.is@gmail.com",
-      to: "nati@segoal.com",
+      to: "omeracker1@gmail.com",
       attachments: [
         ...files.map((upload) => ({
           path: upload,
@@ -101,9 +101,9 @@ app.post("/submit", async (req, res) => {
   const customFont = await pdfDoc.embedFont(fontBytes);
 
   const newPdf = pdfDoc.getPages()[0];
-  newPdf.drawText(name, { x: 420, y: 785, size: 10, font: customFont });
-  newPdf.drawText(name, { x: 105, y: 150, size: 12, font: customFont });
-  newPdf.drawText(id, { x: 303, y: 785, size: 11, font: customFont });
+  newPdf.drawText(name, { x: 460, y: 785, size: 10, font: customFont });
+  newPdf.drawText(name, { x: 105, y: 125, size: 12, font: customFont });
+  newPdf.drawText(id, { x: 363, y: 785, size: 11, font: customFont });
   newPdf.drawText(`${day}`, { x: 320, y: 184, size: 11, font: customFont });
   newPdf.drawText(`${year}`, { x: 170, y: 184, size: 11, font: customFont });
   newPdf.drawText(`${monthsNames[month]}`, {
@@ -114,9 +114,9 @@ app.post("/submit", async (req, res) => {
   });
 
   const pngsignature = await pdfDoc.embedPng(signature);
-  const pngDims = pngsignature.scale(0.14);
+  const pngDims = pngsignature.scale(0.2);
   newPdf.drawImage(pngsignature, {
-    x: 20,
+    x: 60,
     y: 150,
     width: pngDims.width,
     height: pngDims.height,
