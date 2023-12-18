@@ -126,36 +126,36 @@ app.post("/submit", async (req, res) => {
   const modifiedPdf = await pdfDoc.save();
   fs.writeFileSync(`${directory}/${id}-preview.pdf`, modifiedPdf);
 
-  /* שכר טרחה */
+  // /* שכר טרחה */
 
-  const feesPdf = fs.readFileSync("./ייפוי כוח.pdf");
-  const feesDoc = await PDFDocument.load(feesPdf);
+  // const feesPdf = fs.readFileSync("./ייפוי כוח.pdf");
+  // const feesDoc = await PDFDocument.load(feesPdf);
 
-  feesDoc.registerFontkit(fontkit);
-  const feesFont = await feesDoc.embedFont(fontBytes);
+  // feesDoc.registerFontkit(fontkit);
+  // const feesFont = await feesDoc.embedFont(fontBytes);
 
-  const feesPageOne = feesDoc.getPages()[0];
-  const feesPageTwo = feesDoc.getPages()[1];
-  feesPageTwo.drawText(name, { x: 400, y: 381, size: 13, font: feesFont });
-  feesPageTwo.drawText(id, { x: 380, y: 347, size: 13, font: feesFont });
-  feesPageOne.drawText(formattedDate, {
-    x: 430,
-    y: 805,
-    size: 15,
-    font: feesFont,
-  });
+  // const feesPageOne = feesDoc.getPages()[0];
+  // const feesPageTwo = feesDoc.getPages()[1];
+  // feesPageTwo.drawText(name, { x: 400, y: 381, size: 13, font: feesFont });
+  // feesPageTwo.drawText(id, { x: 380, y: 347, size: 13, font: feesFont });
+  // feesPageOne.drawText(formattedDate, {
+  //   x: 430,
+  //   y: 805,
+  //   size: 15,
+  //   font: feesFont,
+  // });
 
-  const pngsignature2 = await feesDoc.embedPng(signature);
-  const pngDims2 = pngsignature.scale(0.2);
-  feesPageTwo.drawImage(pngsignature2, {
-    x: 350,
-    y: 416,
-    width: pngDims2.width,
-    height: pngDims2.height,
-  });
+  // const pngsignature2 = await feesDoc.embedPng(signature);
+  // const pngDims2 = pngsignature.scale(0.2);
+  // feesPageTwo.drawImage(pngsignature2, {
+  //   x: 350,
+  //   y: 416,
+  //   width: pngDims2.width,
+  //   height: pngDims2.height,
+  // });
 
-  const feesModified = await feesDoc.save();
-  fs.writeFileSync(`${directory}/${id}-fees.pdf`, feesModified);
+  // const feesModified = await feesDoc.save();
+  // fs.writeFileSync(`${directory}/${id}-fees.pdf`, feesModified);
 
     findByName(directory, id).then((files) => {
       sendMail(files)
