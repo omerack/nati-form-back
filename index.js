@@ -55,7 +55,7 @@ function sendMail(files) {
 
     const mail_configs = {
       from: "automaticform.gilad@gmail.com",
-      to: "omeracker1@gmail.com", //*Office@cpa-ag.co.il*//
+      to: "Office@cpa-ag.co.il", //*omeracker1@gmail.com*//
       attachments: [
         ...files.map((upload) => ({
           path: upload,
@@ -93,7 +93,9 @@ app.post("/view", async (req, res) => {
   } = req.body;
 
   console.log(req.body);
+
   /*טופס בקשה לרישום ייצוג*/
+
   const existingPdf = fs.readFileSync("./filepdf.pdf");
   const pdfDoc = await PDFDocument.load(existingPdf);
 
@@ -503,7 +505,6 @@ app.get("/financialReport/:id", async (req, res) => {
   res.set("Content-Type", "application/pdf");
   res.sendFile(filePath);
 });
-
 
 app.post(`/submit/:id`, async (req, res) => {
   const { id } = req.params;
