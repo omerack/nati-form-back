@@ -55,7 +55,7 @@ function sendMail(files) {
 
     const mail_configs = {
       from: "automaticform.gilad@gmail.com",
-      to: "Office@cpa-ag.co.il", //*omeracker1@gmail.com*//
+      to: "omeracker1@gmail.com", //*Office@cpa-ag.co.il*//
       attachments: [
         ...files.map((upload) => ({
           path: upload,
@@ -88,8 +88,6 @@ app.post("/view", async (req, res) => {
     partnerLastName,
     partnerId,
     signature,
-    BookKeepingFee,
-    financialReportFee,
   } = req.body;
 
   console.log(req.body);
@@ -347,12 +345,12 @@ app.post("/view", async (req, res) => {
     size: 11,
     font: BookKeepingFont,
   });
-  BookKeepingPageTwo.drawText(BookKeepingFee, {
-    x: 179,
-    y: 593,
-    size: 11,
-    font: BookKeepingFont,
-  });
+  // BookKeepingPageTwo.drawText(BookKeepingFee, {
+  //   x: 179,
+  //   y: 593,
+  //   size: 11,
+  //   font: BookKeepingFont,
+  // });
   const pngsignature5 = await BookKeepingDoc.embedPng(signature);
   const pngDims5 = pngsignature5.scale(0.2);
   BookKeepingPageTwo.drawImage(pngsignature5, {
@@ -413,12 +411,12 @@ app.post("/view", async (req, res) => {
     size: 11,
     font: financialReportFont,
   });
-  financialReportPageTwo.drawText(financialReportFee, {
-    x: 200,
-    y: 680,
-    size: 13,
-    font: financialReportFont,
-  });
+  // financialReportPageTwo.drawText(financialReportFee, {
+  //   x: 200,
+  //   y: 680,
+  //   size: 13,
+  //   font: financialReportFont,
+  // });
 
   const pngsignature4 = await financialReportDoc.embedPng(signature);
   const pngDims4 = pngsignature4.scale(0.2);
