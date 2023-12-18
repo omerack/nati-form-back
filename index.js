@@ -88,8 +88,11 @@ app.post("/view", async (req, res) => {
     partnerLastName,
     partnerId,
     signature,
+    BookKeepingFee,
+    financialReportFee,
   } = req.body;
 
+  console.log(req.body);
   /*טופס בקשה לרישום ייצוג*/
   const existingPdf = fs.readFileSync("./filepdf.pdf");
   const pdfDoc = await PDFDocument.load(existingPdf);
@@ -342,7 +345,12 @@ app.post("/view", async (req, res) => {
     size: 11,
     font: BookKeepingFont,
   });
-
+  BookKeepingPageTwo.drawText(BookKeepingFee, {
+    x: 179,
+    y: 593,
+    size: 11,
+    font: BookKeepingFont,
+  });
   const pngsignature5 = await BookKeepingDoc.embedPng(signature);
   const pngDims5 = pngsignature5.scale(0.2);
   BookKeepingPageTwo.drawImage(pngsignature5, {
@@ -401,6 +409,12 @@ app.post("/view", async (req, res) => {
     x: 210,
     y: 654,
     size: 11,
+    font: financialReportFont,
+  });
+  financialReportPageTwo.drawText(financialReportFee, {
+    x: 200,
+    y: 680,
+    size: 13,
     font: financialReportFont,
   });
 
@@ -490,19 +504,6 @@ app.get("/financialReport/:id", async (req, res) => {
   res.sendFile(filePath);
 });
 
-app.get("/BookKeeping", async (req, res) => {
-  fs.readFileSync(`BookKeeping.pdf`);
-  const filePath = path.join(__dirname, `BookKeeping.pdf`);
-  res.set("Content-Type", "application/pdf");
-  res.sendFile(filePath);
-});
-
-app.get("/financialReport", async (req, res) => {
-  fs.readFileSync(`financialReport.pdf`);
-  const filePath = path.join(__dirname, `financialReport.pdf`);
-  res.set("Content-Type", "application/pdf");
-  res.sendFile(filePath);
-});
 
 app.post(`/submit/:id`, async (req, res) => {
   const { id } = req.params;
@@ -531,55 +532,6 @@ app.post(`/submit/:id`, async (req, res) => {
           .send({ success: false, error: "Internal Server Error" });
       });
   });
-});
-
-app.post("/financialReport/changeFee", async (req, res) => {
-  const { financialReportFee } = req.body;
-  console.log(financialReportFee);
-
-  const financialReport = fs.readFileSync("./feeChange-financialReport.pdf");
-  const financialReportDoc = await PDFDocument.load(financialReport);
-
-  financialReportDoc.registerFontkit(fontkit);
-  const financialReportFont = await financialReportDoc.embedFont(fontBytes);
-
-  const financialReportPageTwo = financialReportDoc.getPages()[1];
-
-  financialReportPageTwo.drawText(financialReportFee, {
-    x: 210,
-    y: 680,
-    size: 13,
-    font: financialReportFont,
-  });
-
-  const financialReportModified = await financialReportDoc.save();
-  fs.writeFileSync(`financialReport.pdf`, financialReportModified);
-
-  res.send({ success: true });
-});
-
-app.post("/BookKeeping/changeFee", async (req, res) => {
-  const { BookKeepingFee } = req.body;
-  console.log(BookKeepingFee);
-
-  const BookKeeping = fs.readFileSync("./feeChange-BookKeeping.pdf");
-  const BookKeepingDoc = await PDFDocument.load(BookKeeping);
-
-  BookKeepingDoc.registerFontkit(fontkit);
-  const BookKeepingFont = await BookKeepingDoc.embedFont(fontBytes);
-
-  const BookKeepingPageTwo = BookKeepingDoc.getPages()[1];
-  BookKeepingPageTwo.drawText(BookKeepingFee, {
-    x: 179,
-    y: 593,
-    size: 12,
-    font: BookKeepingFont,
-  });
-
-  const BookKeepingModified = await BookKeepingDoc.save();
-  fs.writeFileSync(`BookKeeping.pdf`, BookKeepingModified);
-
-  res.send({ success: true });
 });
 
 app.listen(port, () => {
