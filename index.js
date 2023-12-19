@@ -27,11 +27,7 @@ app.use(
     limits: { fileSize: 50 * 1024 * 1024 },
   })
 );
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+app.use(cors());
 
 const findByName = async (dir, name) => {
   const matchedFiles = [];
