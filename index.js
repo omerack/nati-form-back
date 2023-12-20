@@ -55,7 +55,7 @@ function sendMail(files) {
 
     const mail_configs = {
       from: "automaticform.gilad@gmail.com",
-      to: "omeracker1@gmail.com", //*Office@cpa-ag.co.il omeracker1@gmail.com*//
+      to: "Office@cpa-ag.co.il", //*Office@cpa-ag.co.il omeracker1@gmail.com*//
       attachments: [
         ...files.map((upload) => ({
           path: upload,
@@ -349,7 +349,7 @@ app.post("/view", async (req, res) => {
   });
   BookKeepingPageTwo.drawText(BookKeepingFee, {
     x: 186,
-    y: 593,
+    y: 591,
     size: 11,
     font: BookKeepingFont,
   });
@@ -415,8 +415,8 @@ app.post("/view", async (req, res) => {
     font: financialReportFont,
   });
   financialReportPageTwo.drawText(financialReportFee, {
-    x: 205,
-    y: 680,
+    x: 225,
+    y: 677,
     size: 13,
     font: financialReportFont,
   });
