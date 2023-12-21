@@ -90,6 +90,8 @@ app.post("/view", async (req, res) => {
     signature,
     BookKeepingFee,
     financialReportFee,
+    association,
+    associationName,
   } = req.body;
 
   console.log(req.body);
@@ -117,6 +119,12 @@ app.post("/view", async (req, res) => {
   const newPdf = pdfDoc.getPages()[0];
   newPdf.drawText(name, { x: 420, y: 625, size: 15, font: customFont });
   newPdf.drawText(lastName, { x: 350, y: 625, size: 15, font: customFont });
+  newPdf.drawText(associationName, {
+    x: 350,
+    y: 625,
+    size: 15,
+    font: customFont,
+  });
   newPdf.drawText(spacedId, { x: 153, y: 625, size: 15, font: customFont });
   newPdf.drawText(spacedPhone, { x: 33, y: 625, size: 15, font: customFont });
   newPdf.drawRectangle({
@@ -206,6 +214,12 @@ app.post("/view", async (req, res) => {
     size: 15,
     font: bituahLeumiFont,
   });
+  bituahLeumiPageOne.drawText(associationName, {
+    x: 450,
+    y: 260,
+    size: 15,
+    font: bituahLeumiFont,
+  });
   const spacedId2 = id.replace(
     /(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})/,
     "$1  $2  $3  $4  $5  $6  $7  $8  $9"
@@ -267,6 +281,12 @@ app.post("/view", async (req, res) => {
     size: 13,
     font: agreementFont,
   });
+  agreementPageOne.drawText(associationName, {
+    x: 435,
+    y: 654,
+    size: 13,
+    font: agreementFont,
+  });
   agreementPageOne.drawText(formattedDate, {
     x: 80,
     y: 703,
@@ -281,6 +301,12 @@ app.post("/view", async (req, res) => {
     font: agreementFont,
   });
   agreementPageThree.drawText(lastName, {
+    x: 360,
+    y: 459,
+    size: 13,
+    font: agreementFont,
+  });
+  agreementPageThree.drawText(associationName, {
     x: 360,
     y: 459,
     size: 13,
@@ -317,6 +343,12 @@ app.post("/view", async (req, res) => {
     font: BookKeepingFont,
   });
   BookKeepingPageOne.drawText(lastName, {
+    x: 290,
+    y: 569,
+    size: 13,
+    font: BookKeepingFont,
+  });
+  BookKeepingPageOne.drawText(associationName, {
     x: 290,
     y: 569,
     size: 13,
@@ -384,6 +416,12 @@ app.post("/view", async (req, res) => {
     font: financialReportFont,
   });
   financialReportPageOne.drawText(lastName, {
+    x: 300,
+    y: 590,
+    size: 13,
+    font: financialReportFont,
+  });
+  financialReportPageOne.drawText(associationName, {
     x: 300,
     y: 590,
     size: 13,
