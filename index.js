@@ -22,6 +22,7 @@ const fontPath = "./Rubik-Light.ttf";
 const fontBytes = fs.readFileSync(fontPath);
 
 app.use(express.static("public"));
+app.use(express.json());
 app.use(
   fileUpload({
     limits: { fileSize: 50 * 1024 * 1024 },
@@ -43,7 +44,7 @@ const findByName = async (dir, name) => {
   return matchedFiles;
 };
 
-function sendMail(files) {
+function sendMail(files, name, lastName, associationName, id) {
   return new Promise((resolve, reject) => {
     var transporter = nodeMailer.createTransport({
       service: "gmail",
@@ -55,13 +56,20 @@ function sendMail(files) {
 
     const mail_configs = {
       from: "automaticform.gilad@gmail.com",
-      to: "Office@cpa-ag.co.il", //*Office@cpa-ag.co.il omeracker1@gmail.com*//
+      to: "omeracker1@gmail.com", //*Office@cpa-ag.co.il omeracker1@gmail.com*//
       attachments: [
         ...files.map((upload) => ({
           path: upload,
         })),
       ],
-      subject: "הודעה חדשה",
+      subject:
+        name &&
+        lastName !== "undefined" &&
+        name.trim() !== "" &&
+        lastName.trim() !== ""
+          ? `${name} ${lastName} ${id}`
+          : `${associationName} ${id}`,
+
       text: "קיבלת פרטים חדשים ",
     };
     transporter.sendMail(mail_configs, function (error, info) {
@@ -90,7 +98,6 @@ app.post("/view", async (req, res) => {
     signature,
     BookKeepingFee,
     financialReportFee,
-    association,
     associationName,
   } = req.body;
 
@@ -117,14 +124,16 @@ app.post("/view", async (req, res) => {
   const spacedPhone = phone.replace(/(\d{3})(\d{1})/, "$1 $2");
 
   const newPdf = pdfDoc.getPages()[0];
-  newPdf.drawText(name, { x: 420, y: 625, size: 15, font: customFont });
-  newPdf.drawText(lastName, { x: 350, y: 625, size: 15, font: customFont });
-  newPdf.drawText(associationName, {
-    x: 350,
-    y: 625,
-    size: 15,
-    font: customFont,
-  });
+  name && newPdf.drawText(name, { x: 420, y: 625, size: 15, font: customFont });
+  lastName &&
+    newPdf.drawText(lastName, { x: 350, y: 625, size: 15, font: customFont });
+  associationName &&
+    newPdf.drawText(associationName, {
+      x: 300,
+      y: 625,
+      size: 15,
+      font: customFont,
+    });
   newPdf.drawText(spacedId, { x: 153, y: 625, size: 15, font: customFont });
   newPdf.drawText(spacedPhone, { x: 33, y: 625, size: 15, font: customFont });
   newPdf.drawRectangle({
@@ -202,24 +211,27 @@ app.post("/view", async (req, res) => {
   bituahLeumiDoc.removePage(0);
   const bituahLeumiPageOne = bituahLeumiDoc.getPages()[1];
   const bituahLeumiPageTwo = bituahLeumiDoc.getPages()[2];
-  bituahLeumiPageOne.drawText(name, {
-    x: 330,
-    y: 260,
-    size: 15,
-    font: bituahLeumiFont,
-  });
-  bituahLeumiPageOne.drawText(lastName, {
-    x: 450,
-    y: 260,
-    size: 15,
-    font: bituahLeumiFont,
-  });
-  bituahLeumiPageOne.drawText(associationName, {
-    x: 450,
-    y: 260,
-    size: 15,
-    font: bituahLeumiFont,
-  });
+  name &&
+    bituahLeumiPageOne.drawText(name, {
+      x: 330,
+      y: 260,
+      size: 15,
+      font: bituahLeumiFont,
+    });
+  lastName &&
+    bituahLeumiPageOne.drawText(lastName, {
+      x: 450,
+      y: 260,
+      size: 15,
+      font: bituahLeumiFont,
+    });
+  associationName &&
+    bituahLeumiPageOne.drawText(associationName, {
+      x: 400,
+      y: 260,
+      size: 15,
+      font: bituahLeumiFont,
+    });
   const spacedId2 = id.replace(
     /(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})(\d{1})/,
     "$1  $2  $3  $4  $5  $6  $7  $8  $9"
@@ -269,24 +281,27 @@ app.post("/view", async (req, res) => {
 
   const agreementPageOne = agreementDoc.getPages()[0];
   const agreementPageThree = agreementDoc.getPages()[2];
-  agreementPageOne.drawText(name, {
-    x: 480,
-    y: 654,
-    size: 13,
-    font: agreementFont,
-  });
-  agreementPageOne.drawText(lastName, {
-    x: 435,
-    y: 654,
-    size: 13,
-    font: agreementFont,
-  });
-  agreementPageOne.drawText(associationName, {
-    x: 435,
-    y: 654,
-    size: 13,
-    font: agreementFont,
-  });
+  name &&
+    agreementPageOne.drawText(name, {
+      x: 480,
+      y: 654,
+      size: 13,
+      font: agreementFont,
+    });
+  lastName &&
+    agreementPageOne.drawText(lastName, {
+      x: 435,
+      y: 654,
+      size: 13,
+      font: agreementFont,
+    });
+  associationName &&
+    agreementPageOne.drawText(associationName, {
+      x: 435,
+      y: 654,
+      size: 11,
+      font: agreementFont,
+    });
   agreementPageOne.drawText(formattedDate, {
     x: 80,
     y: 703,
@@ -294,24 +309,27 @@ app.post("/view", async (req, res) => {
     font: agreementFont,
   });
 
-  agreementPageThree.drawText(name, {
-    x: 410,
-    y: 459,
-    size: 13,
-    font: agreementFont,
-  });
-  agreementPageThree.drawText(lastName, {
-    x: 360,
-    y: 459,
-    size: 13,
-    font: agreementFont,
-  });
-  agreementPageThree.drawText(associationName, {
-    x: 360,
-    y: 459,
-    size: 13,
-    font: agreementFont,
-  });
+  name &&
+    agreementPageThree.drawText(name, {
+      x: 410,
+      y: 459,
+      size: 13,
+      font: agreementFont,
+    });
+  lastName &&
+    agreementPageThree.drawText(lastName, {
+      x: 360,
+      y: 459,
+      size: 13,
+      font: agreementFont,
+    });
+  associationName &&
+    agreementPageThree.drawText(associationName, {
+      x: 340,
+      y: 459,
+      size: 11,
+      font: agreementFont,
+    });
 
   const pngsignature3 = await agreementDoc.embedPng(signature);
   const pngDims3 = pngsignature3.scale(0.2);
@@ -336,24 +354,27 @@ app.post("/view", async (req, res) => {
   const BookKeepingPageOne = BookKeepingDoc.getPages()[0];
   const BookKeepingPageTwo = BookKeepingDoc.getPages()[1];
 
-  BookKeepingPageOne.drawText(name, {
-    x: 330,
-    y: 569,
-    size: 13,
-    font: BookKeepingFont,
-  });
-  BookKeepingPageOne.drawText(lastName, {
-    x: 290,
-    y: 569,
-    size: 13,
-    font: BookKeepingFont,
-  });
-  BookKeepingPageOne.drawText(associationName, {
-    x: 290,
-    y: 569,
-    size: 13,
-    font: BookKeepingFont,
-  });
+  name &&
+    BookKeepingPageOne.drawText(name, {
+      x: 330,
+      y: 569,
+      size: 13,
+      font: BookKeepingFont,
+    });
+  lastName &&
+    BookKeepingPageOne.drawText(lastName, {
+      x: 290,
+      y: 569,
+      size: 13,
+      font: BookKeepingFont,
+    });
+  associationName &&
+    BookKeepingPageOne.drawText(associationName, {
+      x: 300,
+      y: 569,
+      size: 10,
+      font: BookKeepingFont,
+    });
   BookKeepingPageOne.drawText(formattedDate, {
     x: 87,
     y: 716,
@@ -381,7 +402,7 @@ app.post("/view", async (req, res) => {
   });
   BookKeepingPageTwo.drawText(BookKeepingFee, {
     x: 186,
-    y: 591,
+    y: 593,
     size: 11,
     font: BookKeepingFont,
   });
@@ -409,24 +430,27 @@ app.post("/view", async (req, res) => {
   const financialReportPageOne = financialReportDoc.getPages()[0];
   const financialReportPageTwo = financialReportDoc.getPages()[1];
 
-  financialReportPageOne.drawText(name, {
-    x: 340,
-    y: 590,
-    size: 13,
-    font: financialReportFont,
-  });
-  financialReportPageOne.drawText(lastName, {
-    x: 300,
-    y: 590,
-    size: 13,
-    font: financialReportFont,
-  });
-  financialReportPageOne.drawText(associationName, {
-    x: 300,
-    y: 590,
-    size: 13,
-    font: financialReportFont,
-  });
+  name &&
+    financialReportPageOne.drawText(name, {
+      x: 340,
+      y: 590,
+      size: 13,
+      font: financialReportFont,
+    });
+  lastName &&
+    financialReportPageOne.drawText(lastName, {
+      x: 300,
+      y: 590,
+      size: 13,
+      font: financialReportFont,
+    });
+  associationName &&
+    financialReportPageOne.drawText(associationName, {
+      x: 280,
+      y: 590,
+      size: 10,
+      font: financialReportFont,
+    });
   financialReportPageOne.drawText(formattedDate, {
     x: 87,
     y: 718,
@@ -471,31 +495,32 @@ app.post("/view", async (req, res) => {
   const financialReportModified = await financialReportDoc.save();
   fs.writeFileSync(`${id}-financialReport.pdf`, financialReportModified);
 
-  const files = req.files["fileUploads[]"];
+  const filesArrays = req.files; // Assuming you have multiple arrays like fileUploads1, fileUploads2, etc.
 
-  if (Array.isArray(files)) {
-    files.forEach((file, index) => {
-      fs.writeFile(
-        `./${id} - ${index + 1}.${file.name.split(".")[1]}`,
-        file.data,
-        (err) => {
+  Object.keys(filesArrays).forEach((filesKey) => {
+    const files = filesArrays[filesKey];
+
+    if (Array.isArray(files)) {
+      files.forEach((file, index) => {
+        const fileName = `./${id}-${filesKey}-${index + 1}.${file.name.split(".")[1]}`;
+
+        fs.writeFile(fileName, file.data, (err) => {
           if (err) {
             return res.status(500).send(err);
           }
-        }
-      );
-    });
-  } else {
-    fs.writeFile(
-      `./${id} - 1.${files.name.split(".")[1]}`,
-      files.data,
-      (err) => {
+        });
+      });
+    } else {
+      const fileName = `./${id}-${filesKey}-1.${files.name.split(".")[1]}`;
+
+      fs.writeFile(fileName, files.data, (err) => {
         if (err) {
           return res.status(500).send(err);
         }
-      }
-    );
-  }
+      });
+    }
+  });
+
 
   res.send({ success: true });
 });
@@ -545,11 +570,14 @@ app.get("/financialReport/:id", async (req, res) => {
   res.sendFile(filePath);
 });
 
-app.post(`/submit/:id`, async (req, res) => {
-  const { id } = req.params;
+app.post(`/submit`, async (req, res) => {
+  const { id, name, lastName, associationName } = req.body;
+  console.log("associationName:", associationName);
+  console.log("name:", name);
+  console.log("lastName:", lastName);
 
   findByName("./", id).then((files) => {
-    sendMail(files)
+    sendMail(files, name, lastName, associationName, id)
       .then((response) => {
         console.log(response.message);
 
