@@ -1,5 +1,4 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 const { PDFDocument, rgb } = require("pdf-lib");
 const fs = require("fs");
@@ -8,6 +7,7 @@ const path = require("path");
 const nodeMailer = require("nodemailer");
 const { readdir } = require("fs/promises");
 const fileUpload = require("express-fileupload");
+const https = require("https");
 
 const app = express();
 const port = 3001;
@@ -67,7 +67,7 @@ function sendMail(files, name, lastName, associationName, id) {
         lastName !== "undefined" &&
         name.trim() !== "" &&
         lastName.trim() !== ""
-          ? `${name} ${lastName} ${id}`
+          ? `${name} ${lastName}  ${id}`
           : `${associationName} ${id}`,
 
       text: "קיבלת פרטים חדשים ",
@@ -100,8 +100,6 @@ app.post("/view", async (req, res) => {
     financialReportFee,
     associationName,
   } = req.body;
-
-  console.log(req.body);
 
   /*טופס בקשה לרישום ייצוג*/
 
@@ -189,6 +187,7 @@ app.post("/view", async (req, res) => {
     font: customFont,
   });
   const pngsignature = await pdfDoc.embedPng(signature);
+
   const pngDims = pngsignature.scale(0.2);
   newPdf.drawImage(pngsignature, {
     x: 40,
@@ -502,7 +501,9 @@ app.post("/view", async (req, res) => {
 
     if (Array.isArray(files)) {
       files.forEach((file, index) => {
-        const fileName = `./${id}-${filesKey}-${index + 1}.${file.name.split(".")[1]}`;
+        const fileName = `./${id}-${filesKey}-${index + 1}.${
+          file.name.split(".")[1]
+        }`;
 
         fs.writeFile(fileName, file.data, (err) => {
           if (err) {
@@ -520,7 +521,6 @@ app.post("/view", async (req, res) => {
       });
     }
   });
-
 
   res.send({ success: true });
 });
@@ -572,9 +572,82 @@ app.get("/financialReport/:id", async (req, res) => {
 
 app.post(`/submit`, async (req, res) => {
   const { id, name, lastName, associationName } = req.body;
-  console.log("associationName:", associationName);
-  console.log("name:", name);
-  console.log("lastName:", lastName);
+
+  const existingPdf = fs.readFileSync(`${id}-preview.pdf`);
+  const pdfDoc = await PDFDocument.load(existingPdf);
+
+  const existingPdfpageOne = pdfDoc.getPages()[0];
+  const giladSignatureFile = fs.readFileSync("./giladSignature.png");
+  const giladSignature1 = await pdfDoc.embedPng(giladSignatureFile);
+  existingPdfpageOne.drawImage(giladSignature1, {
+    x: 40,
+    y: 130,
+    width: giladSignature1.width / 3,
+    height: giladSignature1.height / 3,
+  });
+
+  const modifiedPdf = await pdfDoc.save();
+  fs.writeFileSync(`${id}-preview.pdf`, modifiedPdf);
+
+  const bituahLeumi = fs.readFileSync(`./${id}-bituahLeumi.pdf`);
+  const bituahLeumiDoc = await PDFDocument.load(bituahLeumi);
+
+  const bituahLeumipageTwo = bituahLeumiDoc.getPages()[1];
+  const giladSignature2 = await bituahLeumiDoc.embedPng(giladSignatureFile);
+  bituahLeumipageTwo.drawImage(giladSignature2, {
+    x: 370,
+    y: 570,
+    width: giladSignature2.width / 3,
+    height: giladSignature2.height / 3,
+  });
+
+  const bituahLeumiModified = await bituahLeumiDoc.save();
+  fs.writeFileSync(`${id}-bituahLeumi.pdf`, bituahLeumiModified);
+
+  const agreement = fs.readFileSync(`./${id}-agreement.pdf`);
+  const agreementDoc = await PDFDocument.load(agreement);
+
+  const agreementpageThree = agreementDoc.getPages()[2];
+  const giladSignature3 = await agreementDoc.embedPng(giladSignatureFile);
+  agreementpageThree.drawImage(giladSignature3, {
+    x: 90,
+    y: 525,
+    width: giladSignature3.width / 3,
+    height: giladSignature3.height / 3,
+  });
+
+  const agreementModified = await agreementDoc.save();
+  fs.writeFileSync(`${id}-agreement.pdf`, agreementModified);
+
+  const BookKeeping = fs.readFileSync(`./${id}-BookKeeping.pdf`);
+  const BookKeepingDoc = await PDFDocument.load(BookKeeping);
+
+  const BookKeepingpageTwo = BookKeepingDoc.getPages()[1];
+  const giladSignature4 = await BookKeepingDoc.embedPng(giladSignatureFile);
+  BookKeepingpageTwo.drawImage(giladSignature4, {
+    x: 160,
+    y: 415,
+    width: giladSignature4.width / 3,
+    height: giladSignature4.height / 3,
+  });
+
+  const BookKeepingModified = await BookKeepingDoc.save();
+  fs.writeFileSync(`${id}-BookKeeping.pdf`, BookKeepingModified);
+
+  const financialReport = fs.readFileSync("./financialReport.pdf");
+  const financialReportDoc = await PDFDocument.load(financialReport);
+
+  const financialReportpageTwo = financialReportDoc.getPages()[1];
+  const giladSignature5 = await financialReportDoc.embedPng(giladSignatureFile);
+  financialReportpageTwo.drawImage(giladSignature5, {
+    x: 130,
+    y: 562,
+    width: giladSignature5.width / 3,
+    height: giladSignature5.height / 3,
+  });
+
+  const financialReportModified = await financialReportDoc.save();
+  fs.writeFileSync(`${id}-financialReport.pdf`, financialReportModified);
 
   findByName("./", id).then((files) => {
     sendMail(files, name, lastName, associationName, id)
