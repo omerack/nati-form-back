@@ -56,7 +56,7 @@ function sendMail(files, name, lastName, associationName, id) {
 
     const mail_configs = {
       from: "automaticform.gilad@gmail.com",
-      to: "omeracker1@gmail.com", //*Office@cpa-ag.co.il omeracker1@gmail.com*//
+      to: "Office@cpa-ag.co.il", //*Office@cpa-ag.co.il omeracker1@gmail.com*//
       attachments: [
         ...files.map((upload) => ({
           path: upload,
@@ -100,6 +100,38 @@ app.post("/view", async (req, res) => {
     financialReportFee,
     associationName,
   } = req.body;
+
+  /*העלאת המסמכים*/
+
+  const filesArrays = req.files;
+
+  Object.keys(filesArrays).forEach((filesKey) => {
+    const files = filesArrays[filesKey];
+
+    if (Array.isArray(files)) {
+      files.forEach((file, index) => {
+        const fileName = `./${id}-${filesKey.replace("[]", "")}-${index + 1}.${
+          file.name.split(".")[1]
+        }`;
+
+        fs.writeFile(fileName, file.data, (err) => {
+          if (err) {
+            return res.status(500).send(err);
+          }
+        });
+      });
+    } else {
+      const fileName = `./${id}-${filesKey.replace("[]", "")}-1.${
+        files.name.split(".")[1]
+      }`;
+
+      fs.writeFile(fileName, files.data, (err) => {
+        if (err) {
+          return res.status(500).send(err);
+        }
+      });
+    }
+  });
 
   /*טופס בקשה לרישום ייצוג*/
 
@@ -494,34 +526,6 @@ app.post("/view", async (req, res) => {
   const financialReportModified = await financialReportDoc.save();
   fs.writeFileSync(`${id}-financialReport.pdf`, financialReportModified);
 
-  const filesArrays = req.files; // Assuming you have multiple arrays like fileUploads1, fileUploads2, etc.
-
-  Object.keys(filesArrays).forEach((filesKey) => {
-    const files = filesArrays[filesKey];
-
-    if (Array.isArray(files)) {
-      files.forEach((file, index) => {
-        const fileName = `./${id}-${filesKey}-${index + 1}.${
-          file.name.split(".")[1]
-        }`;
-
-        fs.writeFile(fileName, file.data, (err) => {
-          if (err) {
-            return res.status(500).send(err);
-          }
-        });
-      });
-    } else {
-      const fileName = `./${id}-${filesKey}-1.${files.name.split(".")[1]}`;
-
-      fs.writeFile(fileName, files.data, (err) => {
-        if (err) {
-          return res.status(500).send(err);
-        }
-      });
-    }
-  });
-
   res.send({ success: true });
 });
 
@@ -573,11 +577,12 @@ app.get("/financialReport/:id", async (req, res) => {
 app.post(`/submit`, async (req, res) => {
   const { id, name, lastName, associationName } = req.body;
 
+  const giladSignatureFile = fs.readFileSync("./giladSignature.png");
+
   const existingPdf = fs.readFileSync(`${id}-preview.pdf`);
   const pdfDoc = await PDFDocument.load(existingPdf);
 
   const existingPdfpageOne = pdfDoc.getPages()[0];
-  const giladSignatureFile = fs.readFileSync("./giladSignature.png");
   const giladSignature1 = await pdfDoc.embedPng(giladSignatureFile);
   existingPdfpageOne.drawImage(giladSignature1, {
     x: 40,
