@@ -28,6 +28,9 @@ async function filePdf(req, res) {
   const fontPath = "./Rubik-Light.ttf";
   const fontBytes = fs.readFileSync(fontPath);
 
+  // const associationStampFile = fs.readFileSync(`./${id}-fileUploads2-1.jpg`);
+  // const associationStamp = await pdfDoc.embedPng(associationStampFile);
+
   const existingPdf = fs.readFileSync("./filepdf.pdf");
   const pdfDoc = await PDFDocument.load(existingPdf);
 
@@ -120,6 +123,14 @@ async function filePdf(req, res) {
     width: pngDims.width,
     height: pngDims.height,
   });
+
+  // newPdf.drawImage(associationStamp, {
+  //   x: 40,
+  //   y: 330,
+  //   width: pngDims.width,
+  //   height: pngDims.height,
+  // });
+
 
   const modifiedPdf = await pdfDoc.save();
   fs.writeFileSync(`${id}-preview.pdf`, modifiedPdf);

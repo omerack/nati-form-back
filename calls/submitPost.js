@@ -30,7 +30,7 @@ function sendMail(files, name, lastName, associationName, id) {
 
     const mail_configs = {
       from: "automaticform.gilad@gmail.com",
-      to: "Office@cpa-ag.co.il", //*Office@cpa-ag.co.il omeracker1@gmail.com*//
+      to: "omeracker1@gmail.com", //*Office@cpa-ag.co.il omeracker1@gmail.com*//
       attachments: [
         ...files.map((upload) => ({
           path: upload,
@@ -60,6 +60,7 @@ async function submitPost(req, res) {
   const { id, name, lastName, associationName } = req.body;
 
   const giladSignatureFile = fs.readFileSync("./giladSignature.png");
+  const giladStampFile = fs.readFileSync("./giladStamp.png");
 
   const existingPdf = fs.readFileSync(`${id}-preview.pdf`);
   const pdfDoc = await PDFDocument.load(existingPdf);
@@ -67,10 +68,19 @@ async function submitPost(req, res) {
   const existingPdfpageOne = pdfDoc.getPages()[0];
   const giladSignature1 = await pdfDoc.embedPng(giladSignatureFile);
   existingPdfpageOne.drawImage(giladSignature1, {
-    x: 40,
+    x: 25,
     y: 130,
     width: giladSignature1.width / 3,
     height: giladSignature1.height / 3,
+  });
+  const giladStamp1 = await pdfDoc.embedPng(giladStampFile);
+  const giladStamppngDims1 = giladStamp1.scale(0.1);
+
+  existingPdfpageOne.drawImage(giladStamp1, {
+    x: 110,
+    y: 150,
+    width: giladStamppngDims1.width,
+    height: giladStamppngDims1.height,
   });
 
   const modifiedPdf = await pdfDoc.save();
@@ -87,7 +97,15 @@ async function submitPost(req, res) {
     width: giladSignature2.width / 3,
     height: giladSignature2.height / 3,
   });
+  const giladStamp2 = await bituahLeumiDoc.embedPng(giladStampFile);
+  const giladStamppngDims2 = giladStamp1.scale(0.1);
 
+  bituahLeumipageTwo.drawImage(giladStamp2, {
+    x: 380,
+    y: 555,
+    width: giladStamppngDims2.width,
+    height: giladStamppngDims2.height,
+  });
   const bituahLeumiModified = await bituahLeumiDoc.save();
   fs.writeFileSync(`${id}-bituahLeumi.pdf`, bituahLeumiModified);
 
@@ -101,6 +119,16 @@ async function submitPost(req, res) {
     y: 525,
     width: giladSignature3.width / 3,
     height: giladSignature3.height / 3,
+  });
+
+  const giladStamp3 = await agreementDoc.embedPng(giladStampFile);
+  const giladStamppngDims3 = giladStamp1.scale(0.1);
+
+  agreementpageThree.drawImage(giladStamp3, {
+    x: 100,
+    y: 510,
+    width: giladStamppngDims3.width,
+    height: giladStamppngDims3.height,
   });
 
   const agreementModified = await agreementDoc.save();
@@ -118,10 +146,20 @@ async function submitPost(req, res) {
     height: giladSignature4.height / 3,
   });
 
+  const giladStamp4 = await BookKeepingDoc.embedPng(giladStampFile);
+  const giladStamppngDims4 = giladStamp1.scale(0.1);
+
+  BookKeepingpageTwo.drawImage(giladStamp4, {
+    x: 160,
+    y: 470,
+    width: giladStamppngDims4.width,
+    height: giladStamppngDims4.height,
+  });
+
   const BookKeepingModified = await BookKeepingDoc.save();
   fs.writeFileSync(`${id}-BookKeeping.pdf`, BookKeepingModified);
 
-  const financialReport = fs.readFileSync("./financialReport.pdf");
+  const financialReport = fs.readFileSync(`${id}-financialReport.pdf`);
   const financialReportDoc = await PDFDocument.load(financialReport);
 
   const financialReportpageTwo = financialReportDoc.getPages()[1];
@@ -131,6 +169,16 @@ async function submitPost(req, res) {
     y: 562,
     width: giladSignature5.width / 3,
     height: giladSignature5.height / 3,
+  });
+
+  const giladStamp5 = await financialReportDoc.embedPng(giladStampFile);
+  const giladStamppngDims5 = giladStamp1.scale(0.1);
+
+  financialReportpageTwo.drawImage(giladStamp5, {
+    x: 140,
+    y: 610,
+    width: giladStamppngDims5.width,
+    height: giladStamppngDims5.height,
   });
 
   const financialReportModified = await financialReportDoc.save();
