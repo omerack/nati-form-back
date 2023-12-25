@@ -78,16 +78,16 @@ app.post(`/submit`, async (req, res) => {
 
 /* ביטוח*/
 
-app.use("/", viewPostInsurance);
+// app.use("/", viewPostInsurance);
 
-app.get("/insurance/preview/:id", async (req, res) => {
-  const userId = req.params.id;
-  console.log(userId);
-  fs.readFileSync(`${userId}-insurance.pdf`);
-  const filePath = path.join(__dirname, `${userId}-insurance.pdf`);
-  res.set("Content-Type", "application/pdf");
-  res.sendFile(filePath);
-});
+// app.get("/insurance/preview/:id", async (req, res) => {
+//   const userId = req.params.id;
+//   console.log(userId);
+//   fs.readFileSync(`${userId}-insurance.pdf`);
+//   const filePath = path.join(__dirname, `${userId}-insurance.pdf`);
+//   res.set("Content-Type", "application/pdf");
+//   res.sendFile(filePath);
+// });
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
