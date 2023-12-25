@@ -13,6 +13,9 @@ const financialReport = require("./cpa/viewPost/financialReport");
 const previewGet = require("./cpa/previewGet");
 const submitPost = require("./cpa/submitPost");
 const submitPostInsurance = require("./insurance/submitPostInsurance");
+const viewPostTaxRefund = require("./TaxRefund/viewPostTaxRefund");
+const previewGetTaxRefund = require("./TaxRefund/previewGetTaxRefund");
+const submitPostTaxRefund = require("./TaxRefund/submitPostTaxRefund");
 
 const app = express();
 const port = 3001;
@@ -84,7 +87,22 @@ app.use("/", viewPostInsurance);
 
 app.use("/", previewGetInsurance);
 
-app.post(`/insurance/submit`, async (req, res) => {
+app.post(`/taxRefund/submit`, async (req, res) => {
+  try {
+    await Promise.all([submitPostTaxRefund(req, res)]);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ success: false, error: "An error occurred." });
+  }
+});
+
+/* החזר מס*/
+
+app.use("/", viewPostTaxRefund);
+
+app.use("/", previewGetTaxRefund);
+
+app.post(`/TaxRefund/submit`, async (req, res) => {
   try {
     await Promise.all([submitPostInsurance(req, res)]);
   } catch (error) {

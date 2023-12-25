@@ -3,13 +3,9 @@ const { PDFDocument } = require("pdf-lib");
 const fs = require("fs");
 const fontkit = require("@pdf-lib/fontkit");
 
-router.post("/insurance/view", async (req, res) => {
+router.post("/TaxRefund/view", async (req, res) => {
   const { name, lastName, id, signature, phone, email } = req.body;
 
-  // console.log(req.body);
-  // console.log(req.files["fileUploads1[]"]);
-  // console.log(req.files);
-  
   /*טופס בקשה לרישום ייצוג*/
 
   const today = new Date();
@@ -21,7 +17,7 @@ router.post("/insurance/view", async (req, res) => {
   const fontPath = "./Rubik-Light.ttf";
   const fontBytes = fs.readFileSync(fontPath);
 
-  const existingPdf = fs.readFileSync("./insurance.pdf");
+  const existingPdf = fs.readFileSync("./taxRefund - ackerman.pdf");
   const pdfDoc = await PDFDocument.load(existingPdf);
 
   pdfDoc.registerFontkit(fontkit);
@@ -30,48 +26,55 @@ router.post("/insurance/view", async (req, res) => {
   fullName = `${name} ${lastName}`;
   console.log(fullName);
 
-  const newPdf = pdfDoc.getPages()[0];
-  newPdf.drawText(fullName, { x: 335, y: 585, size: 11, font: customFont });
-  newPdf.drawText(id, { x: 240, y: 585, size: 11, font: customFont });
-  newPdf.drawText(formattedDate, {
+  const newPdfPageOne = pdfDoc.getPages()[0];
+  const newPdfPageTwo = pdfDoc.getPages()[1];
+  newPdfPageOne.drawText(fullName, { x: 340, y: 606, size: 11, font: customFont });
+  newPdfPageOne.drawText(id, { x: 240, y: 606, size: 11, font: customFont });
+  newPdfPageOne.drawText(formattedDate, {
     x: 70,
-    y: 730,
+    y: 745,
     size: 15,
     font: customFont,
   });
-  newPdf.drawText(`${day}`, {
+  newPdfPageOne.drawText(`${day}`, {
     x: 325,
-    y: 647,
+    y: 669,
     size: 11,
     font: customFont,
   });
-  newPdf.drawText(`${month}`, {
+  newPdfPageOne.drawText(`${month}`, {
     x: 273,
-    y: 647,
+    y: 669,
     size: 11,
     font: customFont,
   });
-  newPdf.drawText(`${year}`, {
-    x: 210,
-    y: 647,
+  newPdfPageOne.drawText(`${year}`, {
+    x: 205,
+    y: 669,
     size: 11,
     font: customFont,
   });
 
-  newPdf.drawText(phone, { x: 335, y: 560, size: 11, font: customFont });
-  newPdf.drawText(email, { x: 150, y: 560, size: 11, font: customFont });
+  newPdfPageOne.drawText(phone, { x: 350, y: 580, size: 11, font: customFont });
+  newPdfPageOne.drawText(email, { x: 150, y: 580, size: 11, font: customFont });
 
+  newPdfPageTwo.drawText(formattedDate, {
+    x: 400,
+    y: 600,
+    size: 13,
+    font: customFont,
+  });
   const pngsignature = await pdfDoc.embedPng(signature);
   const pngDims = pngsignature.scale(0.2);
-  newPdf.drawImage(pngsignature, {
-    x: 380,
-    y: 110,
+  newPdfPageTwo.drawImage(pngsignature, {
+    x: 360,
+    y: 523,
     width: pngDims.width,
     height: pngDims.height,
   });
 
   const modifiedPdf = await pdfDoc.save();
-  fs.writeFileSync(`${id}-insurance.pdf`, modifiedPdf);
+  fs.writeFileSync(`${id}-taxRefund.pdf`, modifiedPdf);
 
   const files = req.files["fileUploads1[]"];
 
