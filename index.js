@@ -1,19 +1,17 @@
 const express = require("express");
 const cors = require("cors");
-const { PDFDocument } = require("pdf-lib");
 const fs = require("fs");
-const fontkit = require("@pdf-lib/fontkit");
-const path = require("path");
+const viewPostInsurance = require("./insurance/viewPostInsurance");
 
 const fileUpload = require("express-fileupload");
-const uploadedFiles = require("./calls/viewPost/uploadedFiles");
-const filePdf = require("./calls/viewPost/filePdf");
-const bituahLeumi = require("./calls/viewPost/bituahLeumi");
-const agreement = require("./calls/viewPost/agreement");
-const bookKeeping = require("./calls/viewPost/BookKeeping");
-const financialReport = require("./calls/viewPost/financialReport");
-const previewGet = require("./calls/previewGet");
-const submitPost = require("./calls/submitPost");
+const uploadedFiles = require("./cpa/viewPost/uploadedFiles");
+const filePdf = require("./cpa/viewPost/filePdf");
+const bituahLeumi = require("./cpa/viewPost/bituahLeumi");
+const agreement = require("./cpa/viewPost/agreement");
+const bookKeeping = require("./cpa/viewPost/BookKeeping");
+const financialReport = require("./cpa/viewPost/financialReport");
+const previewGet = require("./cpa/previewGet");
+const submitPost = require("./cpa/submitPost");
 
 const app = express();
 const port = 3001;
@@ -36,7 +34,7 @@ app.use(
 );
 app.use(cors());
 
-
+/* ראיית חשבון */
 
 app.post("/view", async (req, res) => {
   try {
@@ -76,6 +74,19 @@ app.post(`/submit`, async (req, res) => {
     console.log(error);
     res.status(500).send({ success: false, error: "An error occurred." });
   }
+});
+
+/* ביטוח*/
+
+app.use("/", viewPostInsurance);
+
+app.get("/insurance/preview/:id", async (req, res) => {
+  const userId = req.params.id;
+  console.log(userId);
+  fs.readFileSync(`${userId}-insurance.pdf`);
+  const filePath = path.join(__dirname, `${userId}-insurance.pdf`);
+  res.set("Content-Type", "application/pdf");
+  res.sendFile(filePath);
 });
 
 app.listen(port, () => {
