@@ -87,9 +87,9 @@ app.use("/", viewPostInsurance);
 
 app.use("/", previewGetInsurance);
 
-app.post(`/taxRefund/submit`, async (req, res) => {
+app.post(`/insurance/submit`, async (req, res) => {
   try {
-    await Promise.all([submitPostTaxRefund(req, res)]);
+    await Promise.all([submitPostInsurance(req, res)]);
   } catch (error) {
     console.log(error);
     res.status(500).send({ success: false, error: "An error occurred." });
@@ -102,9 +102,9 @@ app.use("/", viewPostTaxRefund);
 
 app.use("/", previewGetTaxRefund);
 
-app.post(`/TaxRefund/submit`, async (req, res) => {
+app.post(`/taxRefund/submit`, async (req, res) => {
   try {
-    await Promise.all([submitPostInsurance(req, res)]);
+    await Promise.all([submitPostTaxRefund(req, res)]);
   } catch (error) {
     console.log(error);
     res.status(500).send({ success: false, error: "An error occurred." });
