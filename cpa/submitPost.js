@@ -1,4 +1,4 @@
-const { PDFDocument, rgb } = require("pdf-lib");
+const { PDFDocument } = require("pdf-lib");
 const fs = require("fs");
 const fontkit = require("@pdf-lib/fontkit");
 const nodeMailer = require("nodemailer");
@@ -30,7 +30,7 @@ function sendMail(files, name, lastName, associationName, id) {
 
     const mail_configs = {
       from: "automaticform.gilad@gmail.com",
-      to: "Office@cpa-ag.co.il", //*Office@cpa-ag.co.il omeracker1@gmail.com*//
+      to: "omeracker1@gmail.com", //*Office@cpa-ag.co.il omeracker1@gmail.com*//
       attachments: [
         ...files.map((upload) => ({
           path: upload,

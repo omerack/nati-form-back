@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const viewPostInsurance = require("./insurance/viewPostInsurance");
-
+const previewGetInsurance = require("./insurance/previewGetInsurance");
 const fileUpload = require("express-fileupload");
 const uploadedFiles = require("./cpa/viewPost/uploadedFiles");
 const filePdf = require("./cpa/viewPost/filePdf");
@@ -12,6 +12,7 @@ const bookKeeping = require("./cpa/viewPost/BookKeeping");
 const financialReport = require("./cpa/viewPost/financialReport");
 const previewGet = require("./cpa/previewGet");
 const submitPost = require("./cpa/submitPost");
+const submitPostInsurance = require("./insurance/submitPostInsurance");
 
 const app = express();
 const port = 3001;
@@ -64,6 +65,7 @@ app.post("/view", async (req, res) => {
     res.status(500).send({ success: false, error: "An error occurred." });
   }
 });
+0.0;
 
 app.use("/", previewGet);
 
@@ -78,16 +80,18 @@ app.post(`/submit`, async (req, res) => {
 
 /* ביטוח*/
 
-// app.use("/", viewPostInsurance);
+app.use("/", viewPostInsurance);
 
-// app.get("/insurance/preview/:id", async (req, res) => {
-//   const userId = req.params.id;
-//   console.log(userId);
-//   fs.readFileSync(`${userId}-insurance.pdf`);
-//   const filePath = path.join(__dirname, `${userId}-insurance.pdf`);
-//   res.set("Content-Type", "application/pdf");
-//   res.sendFile(filePath);
-// });
+app.use("/", previewGetInsurance);
+
+app.post(`/insurance/submit`, async (req, res) => {
+  try {
+    await Promise.all([submitPostInsurance(req, res)]);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ success: false, error: "An error occurred." });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

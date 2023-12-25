@@ -3,7 +3,6 @@ const { PDFDocument } = require("pdf-lib");
 const fs = require("fs");
 const fontkit = require("@pdf-lib/fontkit");
 
-function viewPostInsurance() {
   router.post("/insurance/view", async (req, res) => {
     const { name, lastName, id, signature } = req.body;
 
@@ -97,6 +96,6 @@ function viewPostInsurance() {
 
     res.send({ success: true });
   });
-}
 
-module.exports = viewPostInsurance;
+
+module.exports = router;
