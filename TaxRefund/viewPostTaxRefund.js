@@ -4,7 +4,7 @@ const fs = require("fs");
 const fontkit = require("@pdf-lib/fontkit");
 
 router.post("/TaxRefund/view", async (req, res) => {
-  const { name, lastName, id, signature, phone, email } = req.body;
+  const { name, lastName, id, signature, phone, email, company } = req.body;
 
   /*טופס בקשה לרישום ייצוג*/
 
@@ -17,7 +17,15 @@ router.post("/TaxRefund/view", async (req, res) => {
   const fontPath = "./Rubik-Light.ttf";
   const fontBytes = fs.readFileSync(fontPath);
 
-  const existingPdf = fs.readFileSync("./taxRefund - ackerman.pdf");
+  let taxRefundCompany = null;
+
+  if (company === "ackerman") {
+    taxRefundCompany = "./taxRefund - ackerman.pdf";
+  } else {
+    taxRefundCompany = "./taxRefund - switch.pdf";
+  }
+
+  const existingPdf = fs.readFileSync(taxRefundCompany);
   const pdfDoc = await PDFDocument.load(existingPdf);
 
   pdfDoc.registerFontkit(fontkit);
@@ -28,7 +36,12 @@ router.post("/TaxRefund/view", async (req, res) => {
 
   const newPdfPageOne = pdfDoc.getPages()[0];
   const newPdfPageTwo = pdfDoc.getPages()[1];
-  newPdfPageOne.drawText(fullName, { x: 340, y: 606, size: 11, font: customFont });
+  newPdfPageOne.drawText(fullName, {
+    x: 340,
+    y: 606,
+    size: 11,
+    font: customFont,
+  });
   newPdfPageOne.drawText(id, { x: 240, y: 606, size: 11, font: customFont });
   newPdfPageOne.drawText(formattedDate, {
     x: 70,

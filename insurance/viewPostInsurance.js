@@ -4,15 +4,10 @@ const fs = require("fs");
 const fontkit = require("@pdf-lib/fontkit");
 
 router.post("/insurance/view", async (req, res) => {
-  const { name, lastName, id, signature, phone, email } = req.body;
+  const { name, lastName, id, signature, phone, email, insuranceFee } =
+    req.body;
 
-  // console.log(req.body);
-  // console.log(req.files["fileUploads1[]"]);
-  // console.log(req.files);
-  
-  /*טופס בקשה לרישום ייצוג*/
-
-  const today = new Date();
+    const today = new Date();
   const day = today.getDate();
   const month = today.getMonth() + 1;
   const year = today.getFullYear();
@@ -60,6 +55,7 @@ router.post("/insurance/view", async (req, res) => {
 
   newPdf.drawText(phone, { x: 335, y: 560, size: 11, font: customFont });
   newPdf.drawText(email, { x: 150, y: 560, size: 11, font: customFont });
+  newPdf.drawText(insuranceFee, { x: 240, y: 269, size: 11, font: customFont });
 
   const pngsignature = await pdfDoc.embedPng(signature);
   const pngDims = pngsignature.scale(0.2);
