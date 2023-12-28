@@ -32,7 +32,6 @@ router.post("/TaxRefund/view", async (req, res) => {
   const customFont = await pdfDoc.embedFont(fontBytes);
 
   fullName = `${name} ${lastName}`;
-  console.log(fullName);
 
   const newPdfPageOne = pdfDoc.getPages()[0];
   const newPdfPageTwo = pdfDoc.getPages()[1];

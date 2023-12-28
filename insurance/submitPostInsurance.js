@@ -52,8 +52,7 @@ function sendMail(files, name, lastName, id) {
 async function submitPostInsurance(req, res) {
   const { id, name, lastName } = req.body;
 
-  const giladSignatureFile = fs.readFileSync("./giladSignature.png");
-  const giladStampFile = fs.readFileSync("./giladStamp.png");
+  const giladSignatureFile = fs.readFileSync("./giladSignature-insurance.png");
 
   const existingPdf = fs.readFileSync(`${id}-insurance.pdf`);
   const pdfDoc = await PDFDocument.load(existingPdf);
@@ -61,19 +60,10 @@ async function submitPostInsurance(req, res) {
   const existingPdfpageOne = pdfDoc.getPages()[0];
   const giladSignature = await pdfDoc.embedPng(giladSignatureFile);
   existingPdfpageOne.drawImage(giladSignature, {
-    x: 50,
-    y: 90,
-    width: giladSignature.width / 3,
-    height: giladSignature.height / 3,
-  });
-  const giladStamp = await pdfDoc.embedPng(giladStampFile);
-  const giladStamppngDims = giladStamp.scale(0.1);
-
-  existingPdfpageOne.drawImage(giladStamp, {
-    x: 150,
-    y: 115,
-    width: giladStamppngDims.width,
-    height: giladStamppngDims.height,
+    x: 140,
+    y: 105,
+    width: giladSignature.width / 14,
+    height: giladSignature.height / 14,
   });
 
   const modifiedPdf = await pdfDoc.save();
