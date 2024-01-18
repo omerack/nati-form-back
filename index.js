@@ -113,6 +113,7 @@ app.post(`/taxRefund/submit`, async (req, res) => {
 
 app.post("/console", (req, res) => {
   console.log("cron job works");
+  res.send({ success: true });
 });
 
 app.listen(port, () => {
