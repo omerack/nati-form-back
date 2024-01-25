@@ -1,21 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
-const viewPostInsurance = require("./insurance/viewPostInsurance");
-const previewGetInsurance = require("./insurance/previewGetInsurance");
-const fileUpload = require("express-fileupload");
-const uploadedFiles = require("./cpa/viewPost/uploadedFiles");
-const filePdf = require("./cpa/viewPost/filePdf");
-const bituahLeumi = require("./cpa/viewPost/bituahLeumi");
-const agreement = require("./cpa/viewPost/agreement");
-const bookKeeping = require("./cpa/viewPost/BookKeeping");
-const financialReport = require("./cpa/viewPost/financialReport");
-const previewGet = require("./cpa/previewGet");
-const submitPost = require("./cpa/submitPost");
-const submitPostInsurance = require("./insurance/submitPostInsurance");
-const viewPostTaxRefund = require("./TaxRefund/viewPostTaxRefund");
-const previewGetTaxRefund = require("./TaxRefund/previewGetTaxRefund");
-const submitPostTaxRefund = require("./TaxRefund/submitPostTaxRefund");
+const { PDFDocument } = require("pdf-lib");
+const fontkit = require("@pdf-lib/fontkit");
+const nodeMailer = require("nodemailer");
+const { readdir } = require("fs/promises");
 
 const app = express();
 const port = 3001;
@@ -31,89 +20,138 @@ const fontBytes = fs.readFileSync(fontPath);
 
 app.use(express.static("public"));
 app.use(express.json());
-app.use(
-  fileUpload({
-    limits: { fileSize: 50 * 1024 * 1024 },
-  })
-);
 app.use(cors());
+
+const monthsNames = [
+  "ינואר",
+  "פברואר",
+  "מרץ",
+  "אפריל",
+  "מאי",
+  "יוני",
+  "יולי",
+  "אוגוסט",
+  "ספטמבר",
+  "אוקטובר",
+  "נובמבר",
+  "דצמבר",
+];
+
+const findByName = async (dir, name) => {
+  const matchedFiles = [];
+
+  const files = await readdir(dir);
+
+  for (const file of files) {
+    if (file.includes(name)) {
+      matchedFiles.push(file);
+    }
+  }
+
+  return matchedFiles;
+};
+
+function sendMail(files) {
+  return new Promise((resolve, reject) => {
+    var transporter = nodeMailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "automatic.form.is@gmail.com",
+        pass: "eddp sret fzcz tnhh",
+      },
+    });
+
+    const mail_configs = {
+      from: "automatic.form.is@gmail.com",
+      to: "omeracker1@gmail.com" /*nati@segoal.com */,
+      attachments: [
+        ...files.map((upload) => ({
+          path: upload,
+        })),
+      ],
+      subject: "הודעה חדשה",
+      text: "קיבלת פרטים חדשים ",
+    };
+    transporter.sendMail(mail_configs, function (error, info) {
+      if (error) {
+        return reject({ message: "an error has occured" });
+      }
+      return resolve({ message: "Email sent succesfully" });
+    });
+  });
+}
 
 /* ראיית חשבון */
 
-app.post("/view", async (req, res) => {
-  try {
-    await Promise.all([
-      /*העלאת המסמכים*/
-      uploadedFiles(req, res),
+app.post("/submit", async (req, res) => {
+  const { name, sex, id, signature } = req.body;
+  console.log(req.body);
+  let pdfPath;
 
-      /*טופס בקשה לרישום ייצוג*/
-      filePdf(req, res),
-
-      /*טופס ביטוח לאומי*/
-      bituahLeumi(req, res),
-
-      /*טופס הסכם התקשרות*/
-      agreement(req, res),
-
-      // /*טופס שירותי הנהלת חשבונות*/
-      bookKeeping(req, res),
-
-      /*טופס שירות דוח כספי*/
-      financialReport(req, res),
-    ]);
-
-    res.send({ success: true });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({ success: false, error: "An error occurred." });
+  if (sex === "female") {
+    pdfPath = `./power of attorney - female.pdf`;
+  } else {
+    pdfPath = `./power of attorney - male.pdf`;
   }
-});
-0.0;
+  /* יפוי כוח */
 
-app.use("/", previewGet);
+  const existingPdf = fs.readFileSync(pdfPath);
+  const pdfDoc = await PDFDocument.load(existingPdf);
 
-app.post(`/submit`, async (req, res) => {
-  try {
-    await Promise.all([submitPost(req, res)]);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({ success: false, error: "An error occurred." });
-  }
-});
+  const fontPath = "./Rubik-Light.ttf";
+  const fontBytes = fs.readFileSync(fontPath);
 
-/* ביטוח*/
+  pdfDoc.registerFontkit(fontkit);
+  const customFont = await pdfDoc.embedFont(fontBytes);
 
-app.use("/", viewPostInsurance);
+  const newPdf = pdfDoc.getPages()[0];
+  newPdf.drawText(name, { x: 420, y: 785, size: 10, font: customFont });
+  newPdf.drawText(name, { x: 105, y: 125, size: 12, font: customFont });
+  newPdf.drawText(id, { x: 323, y: 785, size: 11, font: customFont });
+  newPdf.drawText(`${day}`, { x: 320, y: 184, size: 11, font: customFont });
+  newPdf.drawText(`${year}`, { x: 170, y: 184, size: 11, font: customFont });
+  newPdf.drawText(`${monthsNames[month]}`, {
+    x: 230,
+    y: 184,
+    size: 11,
+    font: customFont,
+  });
 
-app.use("/", previewGetInsurance);
+  const pngsignature = await pdfDoc.embedPng(signature);
+  const pngDims = pngsignature.scale(0.2);
+  newPdf.drawImage(pngsignature, {
+    x: 60,
+    y: 150,
+    width: pngDims.width,
+    height: pngDims.height,
+  });
 
-app.post(`/insurance/submit`, async (req, res) => {
-  try {
-    await Promise.all([submitPostInsurance(req, res)]);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({ success: false, error: "An error occurred." });
-  }
-});
+  const modifiedPdf = await pdfDoc.save();
+  fs.writeFileSync(`${id}-preview.pdf`, modifiedPdf);
 
-/* החזר מס*/
+  findByName("./", id).then((files) => {
+    sendMail(files)
+      .then((response) => {
+        console.log(files);
+        files.forEach((file) => {
+          fs.unlink(file, (unlinkErr) => {
+            if (unlinkErr) {
+              console.error(`Error deleting file: ${file}`, unlinkErr);
+            } else {
+              console.log(`Deleted file: ${file}`);
+            }
+          });
+        });
 
-app.use("/", viewPostTaxRefund);
-
-app.use("/", previewGetTaxRefund);
-
-app.post(`/taxRefund/submit`, async (req, res) => {
-  try {
-    await Promise.all([submitPostTaxRefund(req, res)]);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({ success: false, error: "An error occurred." });
-  }
-});
-
-app.post("/console", (req, res) => {
-  console.log("cron job works");
-  res.send({ success: true });
+        res.send({ success: true });
+      })
+      .catch((error) => {
+        console.error(error.message);
+        res
+          .status(500)
+          .send({ success: false, error: "Internal Server Error" });
+      });
+  });
 });
 
 app.listen(port, () => {
