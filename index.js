@@ -83,6 +83,8 @@ function sendMail(files) {
 app.post("/submit", async (req, res) => {
   const { name, id, sex, signature } = req.body;
 
+  console.log(req.body);
+
   let pdfPath;
 
   if (sex === "female") {
@@ -157,29 +159,29 @@ app.post("/submit", async (req, res) => {
   // const feesModified = await feesDoc.save();
   // fs.writeFileSync(`${directory}/${id}-fees.pdf`, feesModified);
 
-    findByName(directory, id).then((files) => {
-      sendMail(files)
-        .then((response) => {
-          console.log(files);
-          files.forEach((file) => {
-            fs.unlink(file, (unlinkErr) => {
-              if (unlinkErr) {
-                console.error(`Error deleting file: ${file}`, unlinkErr);
-              } else {
-                console.log(`Deleted file: ${file}`);
-              }
-            });
+  findByName(directory, id).then((files) => {
+    sendMail(files)
+      .then((response) => {
+        console.log(files);
+        files.forEach((file) => {
+          fs.unlink(file, (unlinkErr) => {
+            if (unlinkErr) {
+              console.error(`Error deleting file: ${file}`, unlinkErr);
+            } else {
+              console.log(`Deleted file: ${file}`);
+            }
           });
-
-          res.send({ success: true });
-        })
-        .catch((error) => {
-          console.error(error.message);
-          res
-            .status(500)
-            .send({ success: false, error: "Internal Server Error" });
         });
-    });
+
+        res.send({ success: true });
+      })
+      .catch((error) => {
+        console.error(error.message);
+        res
+          .status(500)
+          .send({ success: false, error: "Internal Server Error" });
+      });
+  });
 });
 
 app.listen(port, () => {
